@@ -14,6 +14,12 @@ class Event:
         POST: Un message ou une notification est généré si la capacité atteint un seuil prédéfini. 
               Retourne True si une alerte est déclenchée, False sinon.
         """
+        if current_capacity == max_capacity:
+            # Générer une alerte (par exemple, envoyer un email ou afficher un message)
+            print("Alerte : Capacité du parking presque pleine !")
+            return True
+
+
         pass
 
     def find_vehicule_by_type(self, type, parking):
@@ -33,5 +39,6 @@ class Event:
              date_time est un objet datetime valide.
         POST: La durée totale de stationnement (un objet timedelta) est calculée. 
               Si cette durée dépasse une limite prédéfinie, une alerte est déclenchée ???
-        """
+
+            """
         pass
