@@ -9,7 +9,7 @@ class Parking :
     def __init__(self):
         self.capacity = 120 
         #self.opening_hours = 
-        self.tarif = 2 #unité /heure ?
+        self.tarif = 1 #unité /heure ?
         self.parking = [] #liste des objets Emplacement représentants les places du parking
         self.payment = [] #liste des transactions de paiement enregistrées
 

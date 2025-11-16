@@ -10,7 +10,7 @@ class Vehicule:
     - calculate_fee prend des secondes en entrée (ou calcule depuis entry_time)
     """
 
-    def __init__(self, immatriculation, type="voiture", entry_time=None):
+    def __init__(self, immatriculation, type="visitor", entry_time=None):
         self.immatriculation = immatriculation
         self.type = type
         self.entry_time = entry_time
