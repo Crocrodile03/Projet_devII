@@ -1,8 +1,8 @@
 import datetime
-import classVehicule as Vehicule
-import classEmplacement as Emplacement
-import classEvent as Event
-import classSubscriber as Subscriber
+from classVehicule import Vehicule
+from classEmplacement import Emplacement
+from classEvent import Event
+from classSubscriber import Subscriber
 
 class Parking :
 

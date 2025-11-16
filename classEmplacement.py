@@ -1,4 +1,4 @@
-import classVehicule as Vehicule
+from classVehicule import Vehicule
 
 class Emplacement:
 

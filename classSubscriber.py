@@ -1,5 +1,5 @@
 import datetime
-import classVehicule as Vehicule
+from classVehicule import Vehicule
 
 class Subscriber(Vehicule) :
     """
