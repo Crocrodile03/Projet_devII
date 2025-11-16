@@ -52,7 +52,7 @@ class Emplacement:
         return True
 
     def park_vehicle(self, vehicule, entry_time=None):
-        """Garer un véhicule sur la place (supporte entry_time). Retourne True si succès, False sinon."""
+        """Garer un véhicule sur la place. Retourne True si la place est libre, sinon False si la place est occupée."""
         if vehicule is None:
             return False
         if not hasattr(vehicule, "park"):
@@ -82,10 +82,9 @@ class Emplacement:
 
     def can_accept(self, vehicule_type):
         """
-        Vérifie si le type de la place accepte le type donné.
-        Exemples simples : place 'electrique' n'accepte que 'electrique', place 'tous' accepte tout.
+        Vérifie si le type de la place accepte le type donné(normal, electric, free, disabled).
         """
-        if self.type in ("all", "electric", "free","disabled"):
+        if self.type in ("all", "electric", "free", "disabled"):
             return True
         return self.type == vehicule_type
 
