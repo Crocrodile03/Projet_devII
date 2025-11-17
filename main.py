@@ -1,7 +1,6 @@
 import datetime
 import random
 from classVehicule import Vehicule
-from classEmplacement import Emplacement
 from classParking import Parking
 from classSubscriber import Subscriber
 
@@ -37,7 +36,8 @@ def afficher_menu():
 
 def main():
     #boucle principale
-    pass
-
+    mon_parking = Parking()
+    mon_parking.vehicules_entry("ABC-123", "visiteur")
+    mon_parking.vehicules_leave("ABC-123")
 if __name__ == "__main__":
     main()

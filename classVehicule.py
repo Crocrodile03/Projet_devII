@@ -15,7 +15,6 @@ class Vehicule:
         self.immatriculation = immatriculation
         self.type = type
         self.entry_time = entry_time
-        # self.is_parked = False
 
     # def park(self, entry_time=None):
     #    """Marque le véhicule comme garé et enregistre l'heure d'entrée (now si non fourni)."""
@@ -68,8 +67,10 @@ class Vehicule:
             "immatriculation": self.immatriculation,
             "type": self.type,
             "entry_time": self.entry_time.isoformat() if self.entry_time else None,
-            "is_parked": self.is_parked
         }
 
     def __repr__(self):
-        return "<Vehicule {} type={} parked={}>".format(self.immatriculation, self.type, self.is_parked)
+        return f"<Vehicule {self.immatriculation} type={self.type}>"
+    
+    def __str__(self):
+        return f"Le véhicule avec la plaque d'immatriculation : {self.immatriculation}, de type : {self.type}, est entré à : {self.entry_time}."

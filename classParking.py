@@ -1,6 +1,5 @@
 import datetime
 from classVehicule import Vehicule
-from classEmplacement import Emplacement
 from classEvent import Event
 from classSubscriber import Subscriber
 
@@ -32,32 +31,34 @@ class Parking :
         Exceptions: Lève une exception si le parking est plein ou si aucune place appropriée n'est trouvée.
         """
         vehicule = Vehicule(immatriculation, datetime.datetime.now(), type)
-
+        event = Event()
         for v in self.parking:
             if v.immatriculation == vehicule.immatriculation :
                 raise Exception(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking.")
-        if Event.alert(self.current_capacity, self.max_capacity):
+        if event.alert(self.current_capacity, self.max_capacity):
             raise Exception("Le parking est plein.")
         else:
             if vehicule.type == 'visiteur':
                 self.current_capacity += 1
                 self.parking.append(vehicule)
             elif vehicule.type == 'handicapé':
-                if Event.alert(self.special_current_capacity[0][0], self.special_max_capacity[0][0], 'handicapé'):
+                if event.alert(self.special_current_capacity[0][0], self.special_max_capacity[0][0], 'handicapé'):
                     raise Exception("Aucune place handicapé disponible.")
                 else:
                     self.special_current_capacity[0][0] += 1
                     self.parking.append(vehicule)
             elif vehicule.type == 'électrique':
-                if Event.alert(self.special_current_capacity[1][0], self.special_max_capacity[1][0], 'électrique'):
+                if event.alert(self.special_current_capacity[1][0], self.special_max_capacity[1][0], 'électrique'):
                     raise Exception("Aucune place électrique disponible.")
                 else:
                     self.special_current_capacity[1][0] += 1
                     self.parking.append(vehicule)
+        print(vehicule)
+        print(self.parking)
+        return vehicule
 
 
-
-    def vehicules_leave(self, vehicule):
+    def vehicules_leave(self, immatriculation):
         """
         Paramètre : vehicule, Type : Vehicule ou Subscriber, Description : instance de Vehicule
         PRE: L'objet vehicule est valide. 
@@ -66,7 +67,18 @@ class Parking :
               Si le véhicule n'est pas un abonné, self.current_capacity est décrémentée de 1. 
               Retourne True si la sortie est enregistrée, False sinon.
         """
-        pass
+        for v in self.parking:
+            if v.immatriculation == immatriculation :
+                self.parking.remove(v)
+                if v.type == 'visiteur':
+                    self.current_capacity -= 1
+                elif v.type == 'handicapé':
+                    self.special_current_capacity[0][0] -= 1
+                elif v.type == 'électrique':
+                    self.special_current_capacity[1][0] -= 1
+                print(f"Le véhicule avec l'immatriculation {immatriculation} est sorti du parking.")
+                print(self.parking)
+                return True
 
     def calculate_tarif(self, duration):
         """

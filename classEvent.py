@@ -16,9 +16,10 @@ class Event:
         """
         if current_capacity == max_capacity:
             # Générer une alerte (par exemple, envoyer un email ou afficher un message)
-            # print(f"Alerte : Les places {type} sont pleines!")
+            print(f"Alerte : Les places {type} sont pleines!")
             return True
         else :
+            print(f"Places {type} disponibles.")
             return False
 
     def find_vehicule_by_type(self, type, parking):
