@@ -7,15 +7,22 @@ from classSubscriber import Subscriber
 class Parking :
 
     def __init__(self):
-        self.capacity = 120 
-        #self.opening_hours = 
-        self.tarif = 1 #unité /heure ?
-        self.parking = [] #liste des objets Emplacement représentants les places du parking
+        self.max_capacity = 120 
+        self.current_capacity = 0
+        self.opening_hours = "Lundi à Samedi : de 6h00 à 22h00 et Dimanche : de 8h00 à 20h00" 
+        self.tarif = 1 #euro/heure
+        self.maxtarif = 10 #euro/jour
+        self.tarif_abonnement = 60 #euro/mois
+        self.timeout_limit = 24 #24 heures
+        self.special_max_capacity = ([6,"handicapé"],[4,"électrique"],[12,"abonné"]) #liste des capacités spéciales par type de véhicule
+        self.special_current_capacity = ([0,"handicapé"],[0,"électrique"],[12,"abonné"]) #liste des capacités spéciales par type de véhicule
+        self.parking = [] #liste des objets Vehicule représentants les instances de véhicules garés dans le parking
         self.payment = [] #liste des transactions de paiement enregistrées
 
-    def vehicules_entry(self, vehicule):
+    def vehicules_entry(self, immatriculation, type):
         """
-        Paramètre : vehicule, Type : Vehicule ou Subscriber, DEscription : instance de Vehicule représentant un véhicule qui rentre dans le parking.
+        Paramètre : immatriculation: type : str; Description : chaîne de caractères représentant l'immatriculation du véhicule qui rentre dans le parking.
+        Paramètre : type: type str ; Description : chaîne de caractères représentant le type de place (visiteur, abonné; électrique, handicapé) que prendra le véhicule dans le parking.
         PRE: L'objet vehicule est valide. 
              Une place disponible correspondant au vehicule.type existe (sauf pour les abonnés ayant des places fixes).
         POST: Un Emplacement libre est trouvé (ou attribué pour un abonné). 
@@ -24,7 +31,31 @@ class Parking :
               L'objet Emplacement attribué est retourné.
         Exceptions: Lève une exception si le parking est plein ou si aucune place appropriée n'est trouvée.
         """
-        pass
+        vehicule = Vehicule(immatriculation, datetime.datetime.now(), type)
+
+        for v in self.parking:
+            if v.immatriculation == vehicule.immatriculation :
+                raise Exception(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking.")
+        if Event.alert(self.current_capacity, self.max_capacity):
+            raise Exception("Le parking est plein.")
+        else:
+            if vehicule.type == 'visiteur':
+                self.current_capacity += 1
+                self.parking.append(vehicule)
+            elif vehicule.type == 'handicapé':
+                if Event.alert(self.special_current_capacity[0][0], self.special_max_capacity[0][0], 'handicapé'):
+                    raise Exception("Aucune place handicapé disponible.")
+                else:
+                    self.special_current_capacity[0][0] += 1
+                    self.parking.append(vehicule)
+            elif vehicule.type == 'électrique':
+                if Event.alert(self.special_current_capacity[1][0], self.special_max_capacity[1][0], 'électrique'):
+                    raise Exception("Aucune place électrique disponible.")
+                else:
+                    self.special_current_capacity[1][0] += 1
+                    self.parking.append(vehicule)
+
+
 
     def vehicules_leave(self, vehicule):
         """
