@@ -19,14 +19,14 @@ class Subscriber(Vehicule) :
         self.subscribe_date = subcscribe_date #date de souscription à l'abonnement.
         self.is_subscribe = True
 
-    def subscribe(self, immatriculation):
+    def subscribe(self, immatriculation : str):
         """
         PRE:
         POST:
         """
         pass
 
-    def calculate_timeout(self, immatriculation):
+    def calculate_timeout(self, immatriculation : str):
         """
         PRE:
         POST:

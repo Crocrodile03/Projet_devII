@@ -5,10 +5,19 @@ class Event:
     def __init__(self):
         pass
 
+    # def get_duration(self, now=None):
+    #    """Renvoie la durée depuis entry_time en secondes (int)."""
+    #    now = now or datetime.datetime.now()
+    #    if not self.entry_time:
+    #        return 0
+    #    seconds = int((now - self.entry_time).total_seconds())
+    #    return max(0, seconds)
+
     def alert(self, current_capacity, max_capacity, type='visiteur'):
         """
-        Paramètre : current_capacity, Type : int, Description : nombre actuel de places occupées.
-        Paramètre : max_capacity, Type : int, Description : Attribu capacity de l'objet Parking
+        Paramètre : current_capacity; Type : int; Description : nombre actuel de places occupées.
+        Paramètre : max_capacity; Type : int; Description : Attribu capacity de l'objet Parking
+        Paramètre : type; Type : str; Description : Catégorie de véhicule (par défaut 'visiteur').
         PRE: Les capacités sont des nombres entiers non négatifs. 
              current_capacity est inférieur ou égal à max_capacity.
         POST: Un message ou une notification est généré si la capacité atteint un seuil prédéfini. 
@@ -24,8 +33,8 @@ class Event:
 
     def find_vehicule_by_type(self, type, parking):
         """
-        Paramètre : type, Type : str, Description : Catégorie de véhicule à rechercher.
-        Paramètre : parking, Type : list, Description : Liste des emplacements contenus dans l'attribu parking de l'objet Parking. 
+        Paramètre : type; Type : str; Description : Catégorie de véhicule à rechercher.
+        Paramètre : parking; Type : list; Description : Liste des emplacements contenus dans l'attribu parking de l'objet Parking. 
         PRE: L'entrée type est une chaîne de caractères valide. L'entrée parking est une collection itérable d'objets contenant des informations sur les véhicules/emplacements.
         POST: Une liste ou un itérateur des objets Vehicule (ou des immatriculations) correspondant au type spécifié est retourné.
         """
@@ -33,8 +42,8 @@ class Event:
 
     def timeout(self, vehicule, date_time):
         """
-        Paramètre : vehicule, Type : Vehicule, Description : L'instance de véhicule concerné.
-        Paramètre : date_time, Type : datetime, Descritption : Lheure actuelle pour calculer la durée du stationnement.
+        Paramètre : vehicule; Type : Vehicule; Description : L'instance de véhicule concerné.
+        Paramètre : date_time; Type : datetime; Descritption : Lheure actuelle pour calculer la durée du stationnement.
         PRE: L'objet vehicule est valide et possède un entry_time. 
              date_time est un objet datetime valide.
         POST: La durée totale de stationnement (un objet timedelta) est calculée. 
