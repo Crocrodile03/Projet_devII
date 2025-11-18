@@ -18,10 +18,10 @@ class Parking :
         self.parking = [] #liste des objets Vehicule représentants les instances de véhicules garés dans le parking
         self.payment = [] #liste des transactions de paiement enregistrées
 
-    def vehicules_entry(self, immatriculation, type):
+    def vehicules_entry(self, immatriculation : str, type :  str):
         """
-        Paramètre : immatriculation: type : str; Description : chaîne de caractères représentant l'immatriculation du véhicule qui rentre dans le parking.
-        Paramètre : type: type str ; Description : chaîne de caractères représentant le type de place (visiteur, abonné; électrique, handicapé) que prendra le véhicule dans le parking.
+        Paramètre : immatriculation; Type : str; Description : chaîne de caractères représentant l'immatriculation du véhicule qui rentre dans le parking.
+        Paramètre : type; Type: str ; Description : chaîne de caractères représentant le type de place (visiteur, abonné; électrique, handicapé) que prendra le véhicule dans le parking.
         PRE: L'objet vehicule est valide. 
              Une place disponible correspondant au vehicule.type existe (sauf pour les abonnés ayant des places fixes).
         POST: Un Emplacement libre est trouvé (ou attribué pour un abonné). 
@@ -33,8 +33,11 @@ class Parking :
         vehicule = Vehicule(immatriculation, datetime.datetime.now(), type)
         event = Event()
         for v in self.parking:
-            if v.immatriculation == vehicule.immatriculation :
-                raise Exception(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking.")
+            if v.immatriculation == vehicule.immatriculation:
+                if v.type == "abonné":
+                    raise Exception(f"L'immatriculation {v.immatriculation} appartient à un abonné")
+                else:
+                    raise Exception(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking.")
         if event.alert(self.current_capacity, self.max_capacity):
             raise Exception("Le parking est plein.")
         else:
@@ -60,11 +63,11 @@ class Parking :
 
     def vehicules_leave(self, immatriculation):
         """
-        Paramètre : vehicule, Type : Vehicule ou Subscriber, Description : instance de Vehicule
-        PRE: L'objet vehicule est valide. 
-             Le véhicule est associé à un Emplacement occupé dans self.parking.
-        POST: L'emplacement associé est mis à jour comme libre (uniquement pour les non-abonnés) via manage_emplacement(None). 
-              Si le véhicule n'est pas un abonné, self.current_capacity est décrémentée de 1. 
+        Paramètre : immatriculation; Type : str; Attribut immatriculation de l'instance Vehicule qui quitte le parking.
+        PRE: L'immatriculation est valide. 
+             L'immatriculation est associé à une instance de vehicule est occupé dans self.parking.
+        POST: La place de parking associé est mis à jour comme libre (uniquement pour les non-abonnés). 
+              Si le véhicule n'est pas un abonné, self.current_capacity  ou splecial_current_capacity est décrémentée de 1. 
               Retourne True si la sortie est enregistrée, False sinon.
         """
         for v in self.parking:
@@ -82,16 +85,33 @@ class Parking :
 
     def calculate_tarif(self, duration):
         """
-        Paramètre : duration, Type : datetime, Description : attribut entry_time de l'instance Vehicule
+        Paramètre : duration; Type : datetime; Description : attribut entry_time de l'instance Vehicule
         PRE: self.tarif est défini
         POST: Le tarif total dû est calculé et retourné en float.
         """
+
+    # def calculate_parking_fee(self, rate_per_hour, duration_seconds=None, round_up=True):
+    #    """
+    #    Calcule le tarif à payer.
+    #    - rate_per_hour : prix par heure (float)
+    #    - duration_seconds : durée en secondes ; si None, utilise get_duration()
+    #    - round_up : si True, arrondit les heures à l'entier supérieur
+    #    Retourne un float arrondi à 2 décimales.
+    #    """
+    #    dur = duration_seconds if duration_seconds is not None else self.get_duration()
+    #    hours = dur / 3600.0
+    #    if round_up:
+    #        hours = math.ceil(max(0.0, hours))
+    #    else:
+    #        hours = max(0.0, hours)
+    #    fee = hours * rate_per_hour
+    #    return round(fee, 2)
         pass
 
     def register_payment(self, amount, methode):
         """
-        Paramètre : amount, Type : Float, Description : Le montant du paiement reçu
-        Paramètre : methode, Type : str, Description : méthode de paiement (carte ou cash)
+        Paramètre : amount; Type : Float; Description : Le montant du paiement reçu
+        Paramètre : methode; Type : str; Description : méthode de paiement (carte ou cash)
         PRE: amount est un nombre non négatif. 
              methode est une chaîne de caractères valide.
         POST: Un enregistrement de paiement (contenant la date, le montant et la méthode) est ajouté à la liste self.payment.
