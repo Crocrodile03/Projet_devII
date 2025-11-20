@@ -5,13 +5,6 @@ class Event:
     def __init__(self):
         pass
 
-    # def get_duration(self, now=None):
-    #    """Renvoie la durée depuis entry_time en secondes (int)."""
-    #    now = now or datetime.datetime.now()
-    #    if not self.entry_time:
-    #        return 0
-    #    seconds = int((now - self.entry_time).total_seconds())
-    #    return max(0, seconds)
 
     def alert(self, current_capacity, max_capacity, type='visiteur'):
         """
