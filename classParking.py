@@ -44,13 +44,13 @@ class Parking :
             if vehicule.type == 'visiteur':
                 self.current_capacity += 1
                 self.parking.append(vehicule)
-            elif vehicule.type == 'handicapé':
+            elif vehicule.type == 'handicapé': # Rajouter la possibilité de prendre une place visiteur.
                 if event.alert(self.special_current_capacity[0][0], self.special_max_capacity[0][0], 'handicapé'):
                     raise Exception("Aucune place handicapé disponible.")
                 else:
                     self.special_current_capacity[0][0] += 1
                     self.parking.append(vehicule)
-            elif vehicule.type == 'électrique':
+            elif vehicule.type == 'électrique': # Rajouter la possibilité de prendre une place visiteur.
                 if event.alert(self.special_current_capacity[1][0], self.special_max_capacity[1][0], 'électrique'):
                     raise Exception("Aucune place électrique disponible.")
                 else:
@@ -83,12 +83,20 @@ class Parking :
                 print(self.parking)
                 return True
 
-    def calculate_tarif(self, duration):
+    def calculate_tarif(self, immatriculation):
         """
-        Paramètre : duration; Type : datetime; Description : attribut entry_time de l'instance Vehicule
+        Paramètre : vehicule; Type : Vehicule; Description : Instance de vehicule
         PRE: self.tarif est défini
         POST: Le tarif total dû est calculé et retourné en float.
         """
+        for v in self.parking :
+            if v.immatriculation == immatriculation :
+                time_in_parking = v.get_duration()
+                fee = time_in_parking * self.tarif
+                print(fee)
+                return fee
+
+
 
     # def calculate_parking_fee(self, rate_per_hour, duration_seconds=None, round_up=True):
     #    """
@@ -106,7 +114,6 @@ class Parking :
     #        hours = max(0.0, hours)
     #    fee = hours * rate_per_hour
     #    return round(fee, 2)
-        pass
 
     def register_payment(self, amount, methode):
         """
