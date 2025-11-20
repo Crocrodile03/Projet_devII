@@ -2,7 +2,7 @@ import datetime
 from classVehicule import Vehicule
 from classEvent import Event
 
-class Subscribe(Vehicule) :
+class Subscriber(Vehicule) :
     """
     Classe héritée de Vehicule et de ses attribus (surtout immatriculation), avec des attribus spécifiques : first_name, last_name, phone_number, subscribe_date, is_subscribe 
     PRE: Les attributs d'initialisation de Vehicule sont valides. 
@@ -17,7 +17,7 @@ class Subscribe(Vehicule) :
         self.last_name = last_name
         self.phone_number = phone_number
         self.subscribe_date = subcscribe_date #date de souscription à l'abonnement.
-        super().__init__(type) = "abonné"
+        super().__init__(type) == "abonné"
 
     def subscribe(self, immatriculation, p, first_name, last_name, phone_number):
         event = Event()

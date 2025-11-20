@@ -83,12 +83,20 @@ class Parking :
                 print(self.parking)
                 return True
 
-    def calculate_tarif(self, duration):
+    def calculate_tarif(self, immatriculation):
         """
-        Paramètre : duration; Type : datetime; Description : attribut entry_time de l'instance Vehicule
+        Paramètre : vehicule; Type : Vehicule; Description : Instance de vehicule
         PRE: self.tarif est défini
         POST: Le tarif total dû est calculé et retourné en float.
         """
+        for v in self.parking :
+            if v.immatriculation == immatriculation :
+                time_in_parking = v.get_duration()
+                fee = time_in_parking * self.tarif
+                print(fee)
+                return fee
+
+
 
     # def calculate_parking_fee(self, rate_per_hour, duration_seconds=None, round_up=True):
     #    """
@@ -106,7 +114,6 @@ class Parking :
     #        hours = max(0.0, hours)
     #    fee = hours * rate_per_hour
     #    return round(fee, 2)
-        pass
 
     def register_payment(self, amount, methode):
         """

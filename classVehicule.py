@@ -16,6 +16,15 @@ class Vehicule:
         self.type = type
         self.entry_time = entry_time
 
+    def get_duration(self):
+       """Renvoie la durée depuis entry_time en secondes (int)."""
+       now = datetime.now()
+       if now.minute > 0 :
+           now = now.hour + 1
+       heure = int((now- self.entry_time.hour))
+       print(heure)
+       return max(0, heure)
+
     def __repr__(self):
         return f"<Vehicule {self.immatriculation} type={self.type} entry_time={self.entry_time}>"
     
