@@ -40,4 +40,4 @@ class Vehicule:
         return f"<Vehicule {self.immatriculation} type={self.type} entry_time={self.entry_time}>"
     
     def __str__(self):
-        return f"Le véhicule avec la plaque d'immatriculation : {self.immatriculation}, de type : {self.type}, est entré à : {self.entry_time}."
+        return f"Le véhicule avec la plaque d'immatriculation : {self.immatriculation}, de type : {self.type}, est entré à : {self.entry_time.hour}h{self.entry_time.minute:02}."

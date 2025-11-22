@@ -18,10 +18,11 @@ class Event:
         """
         if current_capacity == max_capacity:
             # Générer une alerte (par exemple, envoyer un email ou afficher un message)
-            print(f"Alerte : Les places {type} sont pleines!")
+            # print(f"Alerte : Les places {type} sont pleines!")
             return True
         else :
-            print(f"Places {type} disponibles.")
+            # places_restantes = int(max_capacity) - int(current_capacity)
+            # print(f"Il reste {places_restantes} places {type}s disponibles.")
             return False
 
     def find_vehicule_by_type(self, type, p):
@@ -35,6 +36,7 @@ class Event:
         for v in p.parking :
             if v.type == type :
                 type_of_vehicule.append(v)
+        print(f"Véhicules de type '{type}' dans le parking : {type_of_vehicule}")
         return type_of_vehicule
 
     def timeout(self, vehicule):

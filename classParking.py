@@ -6,17 +6,19 @@ from classSubscriber import Subscriber
 class Parking :
 
     def __init__(self):
-        self.max_capacity = 120 
-        self.current_capacity = 0
+        # [0]: "visiteur" = 120
+        # [1]: "handicapé" = 6
+        # [2]: "électrique" = 4
+        # [3]: "abonné" = 12
+        self.max_capacity = [120,6,4,12] # tuples des capacités par type de véhicule
+        self.current_capacity = [0,0,0,0] # liste des capacités par type de véhicule
+        self.parking = [] # liste des objets Vehicule représentants les instances de véhicules garés dans le parking
         self.opening_hours = "Lundi à Samedi : de 6h00 à 22h00 et Dimanche : de 8h00 à 20h00" 
-        self.tarif = 1 #euro/heure
-        self.maxtarif = 10 #euro/jour
-        self.tarif_abonnement = 60 #euro/mois
-        self.timeout_limit = 24 #24 heures
-        self.special_max_capacity = ([6,"handicapé"],[4,"électrique"],[12,"abonné"]) #liste des capacités spéciales par type de véhicule
-        self.special_current_capacity = ([0,"handicapé"],[0,"électrique"],[12,"abonné"]) #liste des capacités spéciales par type de véhicule
-        self.parking = [] #liste des objets Vehicule représentants les instances de véhicules garés dans le parking
-        self.payment = [] #liste des transactions de paiement enregistrées
+        self.tarif = 1 # euro/heure
+        self.maxtarif = 10 # euro/jour
+        self.tarif_abonnement = 60 # euro/mois
+        self.timeout_limit = 24 # 24 heures
+        self.payment = [] # liste des transactions de paiement enregistrées
 
     def vehicules_entry(self, immatriculation : str, type :  str):
         """
@@ -38,26 +40,26 @@ class Parking :
                     raise Exception(f"L'immatriculation {v.immatriculation} appartient à un abonné")
                 else:
                     raise Exception(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking.")
-        if event.alert(self.current_capacity, self.max_capacity):
+        if event.alert(self.current_capacity[0], self.max_capacity[0]):
             raise Exception("Le parking est plein.")
         else:
             if vehicule.type == 'visiteur':
-                self.current_capacity += 1
+                self.current_capacity[0] += 1
                 self.parking.append(vehicule)
             elif vehicule.type == 'handicapé': # Rajouter la possibilité de prendre une place visiteur.
-                if event.alert(self.special_current_capacity[0][0], self.special_max_capacity[0][0], 'handicapé'):
+                if event.alert(self.current_capacity[1], self.max_capacity[1], 'handicapé'):
                     raise Exception("Aucune place handicapé disponible.")
                 else:
-                    self.special_current_capacity[0][0] += 1
+                    self.current_capacity[1] += 1
                     self.parking.append(vehicule)
             elif vehicule.type == 'électrique': # Rajouter la possibilité de prendre une place visiteur.
-                if event.alert(self.special_current_capacity[1][0], self.special_max_capacity[1][0], 'électrique'):
+                if event.alert(self.current_capacity[2], self.max_capacity[2], 'électrique'):
                     raise Exception("Aucune place électrique disponible.")
                 else:
-                    self.special_current_capacity[1][0] += 1
+                    self.current_capacity[2] += 1
                     self.parking.append(vehicule)
         print(vehicule)
-        print(self.parking)
+        # print(self.parking)
         return vehicule
 
 
@@ -74,13 +76,13 @@ class Parking :
             if v.immatriculation == immatriculation :
                 self.parking.remove(v)
                 if v.type == 'visiteur':
-                    self.current_capacity -= 1
+                    self.current_capacity[0] -= 1
                 elif v.type == 'handicapé':
-                    self.special_current_capacity[0][0] -= 1
+                    self.current_capacity[1] -= 1
                 elif v.type == 'électrique':
-                    self.special_current_capacity[1][0] -= 1
+                    self.current_capacity[2] -= 1
                 print(f"Le véhicule avec l'immatriculation {immatriculation} est sorti du parking.")
-                print(self.parking)
+                # print(self.parking)
                 return True
 
     def calculate_tarif(self, immatriculation):
