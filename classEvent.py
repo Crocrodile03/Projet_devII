@@ -48,4 +48,8 @@ class Event:
         """
         time_in_parking = vehicule.get_duration()
         if time_in_parking >= 24 :
-            pass
+            print(f"Alerte : Le véhicule {vehicule.immatriculation} a dépassé la limite de temps de stationnement.")
+            return True
+        else :
+            print(f"Le véhicule {vehicule.immatriculation} est dans la limite de temps de stationnement.")
+            return False
