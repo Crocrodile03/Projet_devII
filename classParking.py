@@ -84,6 +84,7 @@ class Parking :
                 print(f"Le véhicule avec l'immatriculation {immatriculation} est sorti du parking.")
                 # print(self.parking)
                 return True
+        raise Exception(f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé dans le parking.")
 
     def calculate_tarif(self, immatriculation):
         """
@@ -91,15 +92,17 @@ class Parking :
         PRE: self.tarif est défini
         POST: Le tarif total dû est calculé et retourné en float.
         """
-        for v in self.parking :
-            if v.immatriculation == immatriculation :
+        for v in self.parking:
+            if v.immatriculation == immatriculation:
                 time_in_parking = v.get_duration()
-                fee = time_in_parking * self.tarif
-                print(fee)
+                if time_in_parking * self.tarif >= self.maxtarif:
+                    fee = self.maxtarif 
+                else:
+                    fee = time_in_parking * self.tarif
+                print(f"Le montant est de {fee} euros.")
                 return fee
-
-
-
+        raise Exception(f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé dans le parking.")
+       
     # def calculate_parking_fee(self, rate_per_hour, duration_seconds=None, round_up=True):
     #    """
     #    Calcule le tarif à payer.

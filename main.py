@@ -38,15 +38,17 @@ def main():
     #boucle principale
     event = Event()
     mon_parking = Parking()
+    mon_parking.vehicules_entry("ABC-123", "visiteur")
+    mon_parking.parking[0].entry_time -= datetime.timedelta(hours=3, minutes=15)
 
     actions = [
-        lambda: mon_parking.vehicules_entry("ABC-123", "visiteur"),
-        lambda: mon_parking.vehicules_entry("ABC-123", "visiteur"),
-        lambda: mon_parking.vehicules_entry("DEF-456", "handicapé"),
-        lambda: mon_parking.vehicules_leave("ABC-123"),
-        lambda: mon_parking.vehicules_entry("LEJ-258", "visiteur"),
-        lambda: event.find_vehicule_by_type("visiteur", mon_parking),
-        lambda: mon_parking.vehicules_leave("GHI-789"),
+        lambda: mon_parking.calculate_tarif("ABC-123"),
+        # lambda: mon_parking.vehicules_entry("ABC-123", "visiteur"),
+        # lambda: mon_parking.vehicules_entry("DEF-456", "handicapé"),
+        # lambda: mon_parking.vehicules_leave("ABC-123"),
+        # lambda: mon_parking.vehicules_entry("LEJ-258", "visiteur"),
+        # lambda: event.find_vehicule_by_type("visiteur", mon_parking),
+        # lambda: mon_parking.vehicules_leave("GHI-789"),
     ]
 
     # boucle d’exécution sécurisée
