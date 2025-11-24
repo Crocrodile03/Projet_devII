@@ -17,8 +17,28 @@ class Parking :
         self.tarif = 1 # euro/heure
         self.maxtarif = 10 # euro/jour
         self.tarif_abonnement = 60 # euro/mois
-        self.timeout_limit = 24 # 24 heures
+        self.timeout_limit = datetime.timedelta(hours=24) # 24 heures
+        self.timeout_subscriber = datetime.timedelta(hours=24*30) # 1 mois en heures
         self.payment = [] # liste des transactions de paiement enregistrées
+
+    def timeout(self):
+        """
+        PRE: L'objet vehicule est valide et possède un entry_time. 
+        POST: La durée totale de stationnement (un objet timedelta) est calculée. 
+              Si cette durée dépasse une limite prédéfinie, une alerte est déclenchée ???
+        """
+        now = datetime.datetime.now()
+        for v in self.parking:
+            temps = now - v.entry_time
+            if temps > self.timeout_limit and v.type != 'abonné':
+                print(f"Alerte : Le véhicule {v.immatriculation} a dépassé la limite de temps de stationnement.")
+                # return True
+            elif v.type == 'abonné' and temps > self.timeout_subriber:
+                print(f"Le véhicule {v.immatriculation} a dépassé la limite de temps de stationnement pour un abonné.")
+                # return True
+            else:
+                print(f"Le véhicule {v.immatriculation} est dans la limite de temps de stationnement.")
+                # return False
 
     def vehicules_entry(self, immatriculation : str, type_vehicule :  str):
         """
@@ -59,6 +79,7 @@ class Parking :
                     self.current_capacity[2] += 1
                     self.parking.append(vehicule)
         print(vehicule)
+        self.timeout()
         # print(self.parking)
         return vehicule
 
@@ -82,6 +103,7 @@ class Parking :
                 elif v.type_vehicule == 'électrique':
                     self.current_capacity[2] -= 1
                 print(f"Le véhicule avec l'immatriculation {immatriculation} est sorti du parking.")
+                self.timeout()
                 # print(self.parking)
                 return True
         raise Exception(f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé dans le parking.")

@@ -39,24 +39,3 @@ class Event:
                 type_of_vehicule.append(v)
         print(f"Véhicules de type '{type}' dans le parking : {type_of_vehicule}")
         return type_of_vehicule
-
-    def timeout(self, vehicule, parking):
-        """
-        Paramètre : vehicule; Type : Vehicule; Description : L'instance de véhicule concerné.
-        Paramètre : date_time; Type : datetime; Descritption : Lheure actuelle pour calculer la durée du stationnement.
-        Paramètre : parking; Type : Parking; Description : L'instance de parking pour accéder à la limite de temps.
-        PRE: L'objet vehicule est valide et possède un entry_time. 
-             date_time est un objet datetime valide.
-        POST: La durée totale de stationnement (un objet timedelta) est calculée. 
-              Si cette durée dépasse une limite prédéfinie, une alerte est déclenchée ???
-        """
-
-        time_in_parking = vehicule.get_duration()
-        if time_in_parking >= parking.timeout_limit and vehicule.type != 'abonné':
-            print(f"Alerte : Le véhicule {vehicule.immatriculation} a dépassé la limite de temps de stationnement.")
-            return True
-        elif time_in_parking >= 24 * vehicule.entry_time.month and vehicule.type == 'abonné':
-            print(f"Alerte : Le véhicule {vehicule.immatriculation} a dépassé la limite de temps de stationnement pour un abonné.")
-        else:
-            print(f"Le véhicule {vehicule.immatriculation} est dans la limite de temps de stationnement.")
-            return False
