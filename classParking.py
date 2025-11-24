@@ -27,23 +27,22 @@ class Parking :
         POST: La durée totale de stationnement (un objet timedelta) est calculée. 
               Si cette durée dépasse une limite prédéfinie, une alerte est déclenchée ???
         """
+        if len(self.parking) == 0: 
+            print("Le parking est vide")
         now = datetime.datetime.now()
         for v in self.parking:
             temps = now - v.entry_time
-            if temps > self.timeout_limit and v.type != 'abonné':
+            if temps > self.timeout_limit and v.type_vehicule != 'abonné':
                 print(f"Alerte : Le véhicule {v.immatriculation} a dépassé la limite de temps de stationnement.")
                 # return True
-            elif v.type == 'abonné' and temps > self.timeout_subriber:
+            elif v.type_vehicule == 'abonné' and temps > self.timeout_subriber:
                 print(f"Le véhicule {v.immatriculation} a dépassé la limite de temps de stationnement pour un abonné.")
                 # return True
-            else:
-                print(f"Le véhicule {v.immatriculation} est dans la limite de temps de stationnement.")
-                # return False
 
     def vehicules_entry(self, immatriculation : str, type_vehicule :  str):
         """
         Paramètre : immatriculation; Type : str; Description : chaîne de caractères représentant l'immatriculation du véhicule qui rentre dans le parking.
-        Paramètre : type; Type: str ; Description : chaîne de caractères représentant le type de place (visiteur, abonné; électrique, handicapé) que prendra le véhicule dans le parking.
+        Paramètre : type_vehicule; Type: str ; Description : chaîne de caractères représentant le type de place (visiteur, abonné; électrique, handicapé) que prendra le véhicule dans le parking.
         PRE: L'objet vehicule est valide. 
              Une place disponible correspondant au vehicule.type existe (sauf pour les abonnés ayant des places fixes).
         POST: Un Emplacement libre est trouvé (ou attribué pour un abonné). 
@@ -52,7 +51,7 @@ class Parking :
               L'objet Emplacement attribué est retourné.
         Exceptions: Lève une exception si le parking est plein ou si aucune place appropriée n'est trouvée.
         """
-        vehicule = Vehicule(immatriculation, datetime.datetime.now(), type)
+        vehicule = Vehicule(immatriculation, datetime.datetime.now(), type_vehicule)
         event = Event()
         for v in self.parking:
             if v.immatriculation == vehicule.immatriculation:
@@ -66,18 +65,20 @@ class Parking :
             if vehicule.type_vehicule == 'visiteur':
                 self.current_capacity[0] += 1
                 self.parking.append(vehicule)
-            elif vehicule.type_vehicule == 'handicapé': # Rajouter la possibilité de prendre une place visiteur.
+            elif vehicule.type_vehicule == 'handicapé':
                 if event.alert(self.current_capacity[1], self.max_capacity[1], 'handicapé'):
                     raise Exception("Aucune place handicapé disponible.")
                 else:
                     self.current_capacity[1] += 1
                     self.parking.append(vehicule)
-            elif vehicule.type_vehicule == 'électrique': # Rajouter la possibilité de prendre une place visiteur.
+            elif vehicule.type_vehicule == 'électrique':
                 if event.alert(self.current_capacity[2], self.max_capacity[2], 'électrique'):
                     raise Exception("Aucune place électrique disponible.")
                 else:
                     self.current_capacity[2] += 1
                     self.parking.append(vehicule)
+            else:
+                raise Exception("Type non valide")
         print(vehicule)
         self.timeout()
         # print(self.parking)

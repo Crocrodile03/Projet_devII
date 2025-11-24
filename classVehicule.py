@@ -33,7 +33,7 @@ class Vehicule:
         # Sinon je renvoie le nombre d'heures pile
 
     def __repr__(self):
-        return f"<Vehicule {self.immatriculation} type={self.type} entry_time={self.entry_time}>"
+        return f"<Vehicule {self.immatriculation} type={self.type_vehicule} entry_time={self.entry_time}>"
     
     def __str__(self):
-        return f"Le véhicule avec la plaque d'immatriculation : {self.immatriculation}, de type : {self.type}, est entré à : {self.entry_time.hour}h{self.entry_time.minute:02}."
+        return f"Le véhicule avec la plaque d'immatriculation : {self.immatriculation}, de type : {self.type_vehicule}, est entré à : {self.entry_time.hour}h{self.entry_time.minute:02}."
