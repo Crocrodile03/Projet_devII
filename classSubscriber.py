@@ -12,12 +12,11 @@ class Subscriber(Vehicule) :
           Les attributs spécifiques à l'abonné sont définis.
     """
     def __init__(self, immatriculation : str, first_name : str, last_name : str, phone_number : str, subcscribe_date : datetime):
-        super().__init__(immatriculation) #héritage de l'attribut de son parent.
+        super().__init__(immatriculation, type_vehicule="abonné") #héritage de l'attribut de son parent.
         self.first_name = first_name
         self.last_name = last_name
         self.phone_number = phone_number
         self.subscribe_date = subcscribe_date #date de souscription à l'abonnement.
-        super().__init__(type) == "abonné"
 
     def subscribe(self, immatriculation, p, first_name, last_name, phone_number):
         event = Event()

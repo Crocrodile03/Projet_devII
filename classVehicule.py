@@ -10,9 +10,9 @@ class Vehicule:
     - les différents type sont : "visiteur" (Par défaut), "abonné", "électrique", "handicapé"
     """
 
-    def __init__(self, immatriculation: str, entry_time: datetime, type="visiteur"):
+    def __init__(self, immatriculation: str, entry_time: datetime, type_vehicule="visiteur"):
         self.immatriculation = immatriculation
-        self.type = type
+        self.type_vehicule = type_vehicule
         self.entry_time = entry_time
 
     def get_duration(self):

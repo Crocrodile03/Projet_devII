@@ -20,7 +20,7 @@ class Parking :
         self.timeout_limit = 24 # 24 heures
         self.payment = [] # liste des transactions de paiement enregistrées
 
-    def vehicules_entry(self, immatriculation : str, type :  str):
+    def vehicules_entry(self, immatriculation : str, type_vehicule :  str):
         """
         Paramètre : immatriculation; Type : str; Description : chaîne de caractères représentant l'immatriculation du véhicule qui rentre dans le parking.
         Paramètre : type; Type: str ; Description : chaîne de caractères représentant le type de place (visiteur, abonné; électrique, handicapé) que prendra le véhicule dans le parking.
@@ -36,23 +36,23 @@ class Parking :
         event = Event()
         for v in self.parking:
             if v.immatriculation == vehicule.immatriculation:
-                if v.type == "abonné":
+                if v.type_vehicule == "abonné":
                     raise Exception(f"L'immatriculation {v.immatriculation} appartient à un abonné")
                 else:
                     raise Exception(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking.")
         if event.alert(self.current_capacity[0], self.max_capacity[0]):
             raise Exception("Le parking est plein.")
         else:
-            if vehicule.type == 'visiteur':
+            if vehicule.type_vehicule == 'visiteur':
                 self.current_capacity[0] += 1
                 self.parking.append(vehicule)
-            elif vehicule.type == 'handicapé': # Rajouter la possibilité de prendre une place visiteur.
+            elif vehicule.type_vehicule == 'handicapé': # Rajouter la possibilité de prendre une place visiteur.
                 if event.alert(self.current_capacity[1], self.max_capacity[1], 'handicapé'):
                     raise Exception("Aucune place handicapé disponible.")
                 else:
                     self.current_capacity[1] += 1
                     self.parking.append(vehicule)
-            elif vehicule.type == 'électrique': # Rajouter la possibilité de prendre une place visiteur.
+            elif vehicule.type_vehicule == 'électrique': # Rajouter la possibilité de prendre une place visiteur.
                 if event.alert(self.current_capacity[2], self.max_capacity[2], 'électrique'):
                     raise Exception("Aucune place électrique disponible.")
                 else:
@@ -75,11 +75,11 @@ class Parking :
         for v in self.parking:
             if v.immatriculation == immatriculation :
                 self.parking.remove(v)
-                if v.type == 'visiteur':
+                if v.type_vehicule == 'visiteur':
                     self.current_capacity[0] -= 1
-                elif v.type == 'handicapé':
+                elif v.type_vehicule == 'handicapé':
                     self.current_capacity[1] -= 1
-                elif v.type == 'électrique':
+                elif v.type_vehicule == 'électrique':
                     self.current_capacity[2] -= 1
                 print(f"Le véhicule avec l'immatriculation {immatriculation} est sorti du parking.")
                 # print(self.parking)
