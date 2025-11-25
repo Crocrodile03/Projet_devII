@@ -26,7 +26,7 @@ class Event:
             # print(f"Il reste {places_restantes} places {type}s disponibles.")
             return False
 
-    def find_vehicule_by_type(self, type, p):
+    def find_vehicule_by_type(self, type_v, p):
         """
         Paramètre : type; Type : str; Description : Catégorie de véhicule à rechercher.
         Paramètre : parking; Type : list; Description : Liste des emplacements contenus dans l'attribu parking de l'objet Parking. 
@@ -35,7 +35,7 @@ class Event:
         """
         type_of_vehicule = []
         for v in p.parking :
-            if v.type == type :
+            if v.type_vehicule == type_v :
                 type_of_vehicule.append(v)
-        print(f"Véhicules de type '{type}' dans le parking : {type_of_vehicule}")
+        print(f"Véhicules de type '{type_v}' dans le parking : {type_of_vehicule}")
         return type_of_vehicule

@@ -21,7 +21,7 @@ class Subscriber(Vehicule) :
 
     def subscribe(self, immatriculation, p, first_name, last_name, phone_number):
         event = Event()
-        if event.alert(p.special_current_capacity[3], p.special_max_capacity[3], 'abonné'):
+        if event.alert(p.current_capacity[3], p.max_capacity[3], 'abonné'):
             raise Exception("Nombre maximum d'abonné atteint")
         else :
             subscriber = Subscriber(immatriculation, first_name, last_name, phone_number, datetime.datetime.now())
@@ -29,16 +29,15 @@ class Subscriber(Vehicule) :
                 if v.immatriculation == subscriber.immatriculation:
                     if v.type_vehicule == "abonné":
                         raise Exception(f"Cette personne est déjà abonné")
-                    p.parking.remove(v)
-                    if v.type_vehicule == "visiteur":
-                        p.current_capacity[0] -= 1
+                    elif v.type_vehicule == "visiteur":
+                        raise Exception(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking sur une place visiteur.")
                     elif v.type_vehicule == "handicapé":
-                        p.special_current_capacity[1] -= 1
+                        raise Exception(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking sur une place handicapé.")
                     elif v.type_vehicule == "électrique":
-                        p.special_current_capacity[2] -= 1
-                p.parking.add(subscriber)
-                p.special_current_capacity[3] += 1
-
+                        raise Exception(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking sur une place électrique.")
+            p.parking.append(subscriber)
+            p.current_capacity[3] += 1
+            
     def calculate_subscribe_fee(self):
         """
         PRE: 
