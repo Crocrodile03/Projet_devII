@@ -18,7 +18,7 @@ class Parking :
         self.maxtarif = 10 # euro/jour
         self.tarif_abonnement = 60 # euro/mois
         self.timeout_limit = datetime.timedelta(hours=24) # 24 heures
-        self.timeout_subscriber = datetime.timedelta(hours=24*30) # 1 mois en heures
+        self.timeout_subriber = datetime.timedelta(hours=24*30) # 30 jours en heures
         self.payment = [] # liste des transactions de paiement enregistrées
 
     def timeout(self):
@@ -108,7 +108,7 @@ class Parking :
                 # print(self.parking)
                 return True
         raise Exception(f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé dans le parking.")
-
+    
     def calculate_tarif(self, immatriculation):
         """
         Paramètre : vehicule; Type : Vehicule; Description : Instance de vehicule
@@ -124,25 +124,8 @@ class Parking :
                     fee = time_in_parking * self.tarif
                 print(f"Le montant est de {fee} euros.")
                 return fee
-        raise Exception(f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé dans le parking.")
-       
-    # def calculate_parking_fee(self, rate_per_hour, duration_seconds=None, round_up=True):
-    #    """
-    #    Calcule le tarif à payer.
-    #    - rate_per_hour : prix par heure (float)
-    #    - duration_seconds : durée en secondes ; si None, utilise get_duration()
-    #    - round_up : si True, arrondit les heures à l'entier supérieur
-    #    Retourne un float arrondi à 2 décimales.
-    #    """
-    #    dur = duration_seconds if duration_seconds is not None else self.get_duration()
-    #    hours = dur / 3600.0
-    #    if round_up:
-    #        hours = math.ceil(max(0.0, hours))
-    #    else:
-    #        hours = max(0.0, hours)
-    #    fee = hours * rate_per_hour
-    #    return round(fee, 2)
-
+        raise Exception(f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé dans le parking.")       
+    
     def register_payment(self, amount, methode):
         """
         Paramètre : amount; Type : Float; Description : Le montant du paiement reçu
