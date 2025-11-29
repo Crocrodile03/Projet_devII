@@ -11,9 +11,29 @@ class Vehicule:
     """
 
     def __init__(self, immatriculation: str, entry_time: datetime=datetime.now(), type_vehicule: str="visiteur"):
-        self.immatriculation = immatriculation
-        self.type_vehicule = type_vehicule
-        self.entry_time = entry_time
+        self.__immatriculation = immatriculation
+        self.__type_vehicule = type_vehicule
+        self.__entry_time = entry_time
+
+    @property
+    def immatriculation(self):
+        return self.__immatriculation
+    
+    @immatriculation.setter
+    def immatriculation(self, immatriculation):
+        self.__immatriculation = immatriculation
+
+    @property
+    def type_vehicule(self):
+        return self.__type_vehicule
+    
+    @type_vehicule.setter
+    def type_vehicule(self, type_vehicule):
+        self.__type_vehicule = type_vehicule
+    
+    @property
+    def entry_time(self):
+        return self.__entry_time
 
     def get_duration(self):
         """Renvoie la durée depuis entry_time en secondes (int)."""
