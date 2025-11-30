@@ -13,10 +13,50 @@ class Subscriber(Vehicule) :
     """
     def __init__(self, immatriculation : str, first_name : str, last_name : str, phone_number : str, subcscribe_date : datetime):
         super().__init__(immatriculation, type_vehicule="abonné") #héritage de l'attribut de son parent.
-        self.first_name = first_name
-        self.last_name = last_name
-        self.phone_number = phone_number
-        self.subscribe_date = subcscribe_date #date de souscription à l'abonnement.
+        self.__first_name = first_name
+        self.__last_name = last_name
+        self.__phone_number = phone_number
+        self.__subscribe_date = subcscribe_date #date de souscription à l'abonnement.
+
+    @property
+    def first_name(self):
+        return self.__first_name
+
+    @first_name.setter
+    def first_name(self, value):
+        if not isinstance(value, str) or len(value.strip()) == 0:
+            raise ValueError("Prénom doit être une chaine")
+        self.__first_name = value
+
+    @property
+    def last_name(self):
+        return self.__last_name
+
+    @last_name.setter
+    def last_name(self, value):
+        if not isinstance(value, str) or len(value.strip()) == 0:
+            raise ValueError("Nom de famille doit être une chaine")
+        self.__last_name = value
+
+    @property
+    def phone_number(self):
+        return self.__phone_number
+
+    @phone_number.setter
+    def phone_number(self, value):
+        if not isinstance(value, str) or len(value.strip()) == 0:
+            raise ValueError("Doit être une chaine")
+        self.__last_name = value
+
+    @property
+    def subscribe_date(self):
+        return self.__subscribe_date
+
+    @subscribe_date.setter
+    def subscribe_date(self, value):
+        if not isinstance(value, str) or len(value.strip()) == 0:
+            raise ValueError("Doit être une chaine")
+        self.__subscribe_date = value
 
 
     def subscribe(self, immatriculation, p, first_name, last_name, phone_number):
