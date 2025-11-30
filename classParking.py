@@ -10,7 +10,7 @@ class Parking :
         # [1]: "handicapé" = 6
         # [2]: "électrique" = 4
         # [3]: "abonné" = 12
-        self.max_capacity = [120,6,4,12] # tuples des capacités par type de véhicule
+        self.max_capacity = (120,6,4,12) # tuples des capacités par type de véhicule
         self.current_capacity = [0,0,0,0] # liste des capacités par type de véhicule
         self.parking = [] # liste des objets Vehicule représentants les instances de véhicules garés dans le parking
         self.opening_hours = "Lundi à Samedi : de 6h00 à 22h00 et Dimanche : de 8h00 à 20h00" 
@@ -20,6 +20,77 @@ class Parking :
         self.timeout_limit = datetime.timedelta(hours=24) # 24 heures
         self.timeout_subriber = datetime.timedelta(hours=24*30) # 30 jours en heures
         self.payment = [] # liste des transactions de paiement enregistrées
+
+    # @property
+    # def max_capacity(self):
+    #     return self.__max_capacity
+
+    # @max_capacity.setter
+    # def max_capacity(self, value):
+    #     if not isinstance(value, tuple) or len(value) == 0:
+    #         raise ValueError("Le type doit être un tuple non vide")
+    #     self.__max_capacity = value
+    
+    # @property
+    # def current_capacity(self):
+    #     return self.__current_capacity
+
+    # @current_capacity.setter
+    # def __current_capacity(self, value):
+    #     if not isinstance(value, list) or len(value) == 0:
+    #         raise ValueError("Le type doit être une liste non vide")
+    #     self.__current_capacity = value
+    
+    # @property
+    # def parking(self):
+    #     return self.__parking
+
+    # @parking.setter
+    # def __parking(self, value):
+    #     if not isinstance(value, list):
+    #         raise ValueError("Le type doit être une liste")
+    #     self.__parking = value
+
+    # @property
+    # def opening_hours(self):
+    #     return self.__opening_hours
+
+    # @parking.setter
+    # def __opening_hours(self, value):
+    #     if not isinstance(value, str) or len(value.strip()) == 0:
+    #         raise ValueError("Le type doit être une chaine")
+    #     self.__opening_hours = value
+
+    # @property
+    # def tarif(self):
+    #     return self.__tarif
+
+    # @tarif.setter
+    # def __tarif(self, value):
+    #     if not isinstance(value, int) or len(value.strip()) <= 0:
+    #         raise ValueError("Le type doit être un entier positif")
+    #     self.__tarif = value
+
+    # @property
+    # def maxtarif(self):
+    #     return self.__maxtarif
+
+    # @maxtarif.setter
+    # def __maxtarif(self, value):
+    #     if not isinstance(value, int) or len(value.strip()) <= 0:
+    #         raise ValueError("Le type doit être un entier positif")
+    #     self.__maxtarif = value
+
+    # @property
+    # def maxtarif(self):
+    #     return self.__maxtarif
+
+    # @maxtarif.setter
+    # def __maxtarif(self, value):
+    #     if not isinstance(value, int) or len(value.strip()) <= 0:
+    #         raise ValueError("Le type doit être un entier positif")
+    #     self.__maxtarif = value
+
 
     def timeout(self):
         """

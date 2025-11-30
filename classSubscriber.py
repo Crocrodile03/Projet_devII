@@ -11,12 +11,11 @@ class Subscriber(Vehicule) :
     POST: Un nouvel objet Subscribe est créé, héritant de Vehicule (en utilisant un type 'abonné'). 
           Les attributs spécifiques à l'abonné sont définis.
     """
-    def __init__(self, immatriculation : str, first_name : str, last_name : str, phone_number : str, subcscribe_date : datetime):
-        super().__init__(immatriculation, type_vehicule="abonné") #héritage de l'attribut de son parent.
+    def __init__(self, immatriculation : str, first_name : str, last_name : str, phone_number : str):
+        super().__init__(immatriculation, entry_time=datetime.datetime.now(), type_vehicule="abonné") #héritage de l'attribut de son parent.
         self.__first_name = first_name
         self.__last_name = last_name
         self.__phone_number = phone_number
-        self.__subscribe_date = subcscribe_date #date de souscription à l'abonnement.
 
     @property
     def first_name(self):
@@ -48,23 +47,13 @@ class Subscriber(Vehicule) :
             raise ValueError("Doit être une chaine")
         self.__last_name = value
 
-    @property
-    def subscribe_date(self):
-        return self.__subscribe_date
 
-    @subscribe_date.setter
-    def subscribe_date(self, value):
-        if not isinstance(value, str) or len(value.strip()) == 0:
-            raise ValueError("Doit être une chaine")
-        self.__subscribe_date = value
-
-
-    def subscribe(self, immatriculation, p, first_name, last_name, phone_number):
+    def subscribe(self,p):
         event = Event()
         if event.alert(p.current_capacity[3], p.max_capacity[3], 'abonné'):
             raise Exception("Nombre maximum d'abonné atteint")
         else :
-            subscriber = Subscriber(immatriculation, first_name, last_name, phone_number, datetime.datetime.now())
+            subscriber = Subscriber(self.immatriculation, self.first_name, self.last_name, self.phone_number)
             for v in p.parking:
                 if v.immatriculation == subscriber.immatriculation:
                     if v.type_vehicule == "abonné":
