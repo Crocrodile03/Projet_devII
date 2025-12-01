@@ -1,7 +1,8 @@
 import datetime
 from classVehicule import Vehicule
 from classEvent import Event
-from classSubscriber import Subscriber
+from classException import CapacityError, MissingVehiculeError
+
 
 class Parking :
 
@@ -36,7 +37,7 @@ class Parking :
     #     return self.__current_capacity
 
     # @current_capacity.setter
-    # def __current_capacity(self, value):
+    # def current_capacity(self, value):
     #     if not isinstance(value, list) or len(value) == 0:
     #         raise ValueError("Le type doit être une liste non vide")
     #     self.__current_capacity = value
@@ -46,7 +47,7 @@ class Parking :
     #     return self.__parking
 
     # @parking.setter
-    # def __parking(self, value):
+    # def parking(self, value):
     #     if not isinstance(value, list):
     #         raise ValueError("Le type doit être une liste")
     #     self.__parking = value
@@ -56,7 +57,7 @@ class Parking :
     #     return self.__opening_hours
 
     # @parking.setter
-    # def __opening_hours(self, value):
+    # def opening_hours(self, value):
     #     if not isinstance(value, str) or len(value.strip()) == 0:
     #         raise ValueError("Le type doit être une chaine")
     #     self.__opening_hours = value
@@ -66,7 +67,7 @@ class Parking :
     #     return self.__tarif
 
     # @tarif.setter
-    # def __tarif(self, value):
+    # def tarif(self, value):
     #     if not isinstance(value, int) or len(value.strip()) <= 0:
     #         raise ValueError("Le type doit être un entier positif")
     #     self.__tarif = value
@@ -76,7 +77,7 @@ class Parking :
     #     return self.__maxtarif
 
     # @maxtarif.setter
-    # def __maxtarif(self, value):
+    # def maxtarif(self, value):
     #     if not isinstance(value, int) or len(value.strip()) <= 0:
     #         raise ValueError("Le type doit être un entier positif")
     #     self.__maxtarif = value
@@ -86,7 +87,7 @@ class Parking :
     #     return self.__maxtarif
 
     # @maxtarif.setter
-    # def __maxtarif(self, value):
+    # def maxtarif(self, value):
     #     if not isinstance(value, int) or len(value.strip()) <= 0:
     #         raise ValueError("Le type doit être un entier positif")
     #     self.__maxtarif = value
@@ -131,25 +132,25 @@ class Parking :
                 else:
                     raise Exception(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking.")
         if event.alert(self.current_capacity[0], self.max_capacity[0]):
-            raise Exception("Le parking est plein.")
+            raise CapacityError("Le parking est plein.")
         else:
             if vehicule.type_vehicule == 'visiteur':
                 self.current_capacity[0] += 1
                 self.parking.append(vehicule)
             elif vehicule.type_vehicule == 'handicapé':
                 if event.alert(self.current_capacity[1], self.max_capacity[1], 'handicapé'):
-                    raise Exception("Aucune place handicapé disponible.")
+                    raise CapacityError("Aucune place handicapé disponible.")
                 else:
                     self.current_capacity[1] += 1
                     self.parking.append(vehicule)
             elif vehicule.type_vehicule == 'électrique':
                 if event.alert(self.current_capacity[2], self.max_capacity[2], 'électrique'):
-                    raise Exception("Aucune place électrique disponible.")
+                    raise CapacityError("Aucune place électrique disponible.")
                 else:
                     self.current_capacity[2] += 1
                     self.parking.append(vehicule)
             else:
-                raise Exception("Type non valide")
+                raise CapacityError("Type non valide")
         print(vehicule)
         self.timeout()
         # print(self.parking)
@@ -178,7 +179,7 @@ class Parking :
                 self.timeout()
                 # print(self.parking)
                 return True
-        raise Exception(f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé dans le parking.")
+        raise MissingVehiculeError(f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé dans le parking.")
     
     def calculate_tarif(self, immatriculation):
         """
@@ -195,7 +196,7 @@ class Parking :
                     fee = time_in_parking * self.tarif
                 print(f"Le montant est de {fee} euros.")
                 return fee
-        raise Exception(f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé dans le parking.")       
+        raise MissingVehiculeError(f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé dans le parking.")       
     
     def register_payment(self, amount, methode):
         """
