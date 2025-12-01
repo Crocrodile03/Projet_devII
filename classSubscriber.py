@@ -1,7 +1,7 @@
 import datetime
 from classVehicule import Vehicule
 from classEvent import Event
-
+from classException import CapacityError, SubscriberConflictError, InvalidValueError
 class Subscriber(Vehicule) :
     """
     Classe héritée de Vehicule et de ses attribus (surtout immatriculation), avec des attribus spécifiques : first_name, last_name, phone_number, subscribe_date, is_subscribe 
@@ -24,8 +24,9 @@ class Subscriber(Vehicule) :
 
     @first_name.setter
     def first_name(self, value):
+        # Changement 10 : Utilisation de InvalidValueError et message précis
         if not isinstance(value, str) or len(value.strip()) == 0:
-            raise ValueError("Prénom doit être une chaine")
+            raise InvalidValueError("L'attribut 'first_name' (prénom) doit être une chaîne de caractères non vide.")
         self.__first_name = value
 
     @property
@@ -34,8 +35,9 @@ class Subscriber(Vehicule) :
 
     @last_name.setter
     def last_name(self, value):
+        # Changement 11 : Utilisation de InvalidValueError et message précis
         if not isinstance(value, str) or len(value.strip()) == 0:
-            raise ValueError("Nom de famille doit être une chaine")
+            raise InvalidValueError("L'attribut 'last_name' (nom de famille) doit être une chaîne de caractères non vide.")
         self.__last_name = value
 
     @property
@@ -45,8 +47,8 @@ class Subscriber(Vehicule) :
     @phone_number.setter
     def phone_number(self, value):
         if not isinstance(value, str) or len(value.strip()) == 0:
-            raise ValueError("Doit être une chaine")
-        self.__last_name = value
+            raise InvalidValueError("L'attribut 'phone_number' (numéro de téléphone) doit être une chaîne de caractères non vide.")
+        self.__phone_number = value 
 
     @property
     def subscribe_date(self):
@@ -54,29 +56,26 @@ class Subscriber(Vehicule) :
 
     @subscribe_date.setter
     def subscribe_date(self, value):
-        if not isinstance(value, str) or len(value.strip()) == 0:
-            raise ValueError("Doit être une chaine")
+        if not isinstance(value, datetime.datetime):
+            raise InvalidValueError("L'attribut 'subscribe_date' doit être un objet datetime.")
         self.__subscribe_date = value
 
 
     def subscribe(self, immatriculation, p, first_name, last_name, phone_number):
         event = Event()
         if event.alert(p.current_capacity[3], p.max_capacity[3], 'abonné'):
-            raise Exception("Nombre maximum d'abonné atteint")
+            raise CapacityError("L'enregistrement d'un nouvel abonné est impossible : la capacité maximale pour les abonnés est atteinte.")
         else :
             subscriber = Subscriber(immatriculation, first_name, last_name, phone_number, datetime.datetime.now())
             for v in p.parking:
                 if v.immatriculation == subscriber.immatriculation:
                     if v.type_vehicule == "abonné":
-                        raise Exception(f"Cette personne est déjà abonné")
-                    elif v.type_vehicule == "visiteur":
-                        raise Exception(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking sur une place visiteur.")
-                    elif v.type_vehicule == "handicapé":
-                        raise Exception(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking sur une place handicapé.")
-                    elif v.type_vehicule == "électrique":
-                        raise Exception(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking sur une place électrique.")
+                        raise SubscriberConflictError(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà enregistré comme abonné.")
+                    elif v.type_vehicule in ["visiteur", "handicapé", "électrique"]:
+                        raise CapacityError(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking sur une place {v.type_vehicule}.")
             p.parking.append(subscriber)
             p.current_capacity[3] += 1
+            print(f"L'abonné {first_name} {last_name} ({immatriculation}) a été ajouté.")
             
     def calculate_subscribe_fee(self):
         """

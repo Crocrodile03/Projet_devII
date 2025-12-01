@@ -1,6 +1,7 @@
 import datetime
 from datetime import datetime
 
+
 class Vehicule:
     """
     Classe véhicule simple.
