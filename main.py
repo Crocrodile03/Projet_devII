@@ -131,7 +131,7 @@ class EntreeVehicule(tk.Frame):
         types = [("Visiteur", "visiteur"), ("Handicapé", "handicapé"), ("Électrique", "électrique")]
         for text, value in types:
             tk.Radiobutton(self, text=text, variable=self.type_var, value=value,
-                           bg=COLOR_BG, fg="white", selectcolor=COLOR_BTN).pack(anchor="n",width=15, pady=2)
+                           bg=COLOR_BG, fg="white", selectcolor=COLOR_BTN).pack(anchor="n", pady=2)
 
         ttk.Button(self, text="Valider", command=self.valider).pack(pady=10)
         ttk.Button(self, text="Retour menu",
