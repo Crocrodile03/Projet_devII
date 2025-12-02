@@ -182,14 +182,14 @@ class Parking :
         POST: Un enregistrement de paiement (contenant la date, le montant et la méthode) est ajouté à la liste self.payment.
         """
 
-    def generer_paiement(self,immatriculation, amont, p):
+    def generer_paiement(self,immatriculation, p, amont):
 
         mois_fr = [
         "janvier", "février", "mars", "avril", "mai", "juin",
         "juillet", "août", "septembre", "octobre", "novembre", "décembre"
     ]
         current_month = mois_fr[datetime.datetime.now().month - 1]
-        for v in p.parking:
+        for v in p:
             if v.immatriculation == immatriculation:
                 time_in_parking = v.get_duration()
                 type_v = v.type_vehicule
@@ -202,7 +202,7 @@ class Parking :
 
 
         # Format ticket
-        largeur, hauteur = 80 * mm, 150 * mm
+        largeur, hauteur = 90 * mm, 120 * mm
         c = canvas.Canvas(file_path, pagesize=(largeur, hauteur))
 
         # Décalage vertical pour placer le texte
@@ -210,14 +210,11 @@ class Parking :
 
         # Titre
         c.setFont("Helvetica-Bold", 14)
-        c.drawCentredString(largeur / 2, y, "TICKET PARKING")
-        c.drawString(100, 800, "Reçu de Paiement - Parking")
+        c.drawCentredString(largeur / 2, y, "TICKET PARKING Reçu de Paiement")
         
         y -= 10 * mm
         # Informations
         c.setFont("Helvetica", 10)
-
-        c.setFont("Helvetica", 14)
         c.drawString(5 * mm, y, f"Immatriculation : {immatriculation}")
         y -= 5 * mm
         c.drawString(5 * mm, y, f"Type de véhicule : {type_v}")

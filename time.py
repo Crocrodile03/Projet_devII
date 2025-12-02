@@ -1,7 +1,5 @@
 from classParking import Parking
-from classEvent import Event
-from classSubscriber import Subscriber
-import datetime
+
 
 mon_parking = Parking()
 mon_parking.vehicules_entry("ABC-123", "visiteur")

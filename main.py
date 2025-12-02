@@ -173,7 +173,8 @@ class SortieVehicule(tk.Frame):
         if not immat:
             self.controller.log_info("Erreur : immatriculation vide.")
             return
-        mon_parking.calculate_tarif(immat)
+        a = mon_parking.calculate_tarif(immat)
+        mon_parking.generer_paiement(immat,mon_parking.parking, a)
         mon_parking.vehicules_leave(immat)
         self.controller.log_info(f"Véhicule {immat} sorti du parking.")
         self.immatriculation_entry.delete(0, tk.END)
