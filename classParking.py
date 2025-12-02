@@ -12,15 +12,14 @@ class Parking :
         # [2]: "électrique" = 4
         # [3]: "abonné" = 12
         self.__max_capacity = (120,6,4,12) # tuples des capacités par type de véhicule
-        self.current_capacity = [0,0,0,0] # liste des capacités par type de véhicule
-        self.parking = [] # liste des objets Vehicule représentants les instances de véhicules garés dans le parking
-        self.opening_hours = "Lundi à Samedi : de 6h00 à 22h00 et Dimanche : de 8h00 à 20h00" 
+        self.__current_capacity = [0,0,0,0] # liste des capacités par type de véhicule
+        self.__parking = [] # liste des objets Vehicule représentants les instances de véhicules garés dans le parking
+        self.__opening_hours = "Lundi à Samedi : de 6h00 à 22h00 et Dimanche : de 8h00 à 20h00" 
         self.__tarif = 1 # euro/heure
         self.__maxtarif = 10 # euro/jour
         self.__tarif_abonnement = 60 # euro/mois
         self.__timeout_limit = datetime.timedelta(hours=24) # 24 heures
         self.__timeout_subscriber = datetime.timedelta(hours=24*30) # 30 jours en heures
-        self.__payment = [] # liste des transactions de paiement enregistrées
 
     @property
     def max_capacity(self):
