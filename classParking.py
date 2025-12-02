@@ -19,7 +19,7 @@ class Parking :
         self.__maxtarif = 10 # euro/jour
         self.tarif_abonnement = 60 # euro/mois
         self.timeout_limit = datetime.timedelta(hours=24) # 24 heures
-        self.timeout_subriber = datetime.timedelta(hours=24*30) # 30 jours en heures
+        self.timeout_subscriber = datetime.timedelta(hours=24*30) # 30 jours en heures
         self.payment = [] # liste des transactions de paiement enregistrées
 
     @property
@@ -64,6 +64,39 @@ class Parking :
     def maxtarif(self):
         return self.__maxtarif
 
+    property
+    def tarif_abonnement(self):
+        return self.tarif_abonnement
+
+    @tarif_abonnement.setter
+    def tarif_abonnement(self, value):
+        if not isinstance(value, (int, float)) or value < 0:
+            raise ValueError("tarif_abonnement doit être un nombre >= 0")
+        self.tarif_abonnement = value
+
+    @property
+    def timeout_limit(self):
+        return self.timeout_limit
+
+    @timeout_limit.setter
+    def timeout_limit(self, value):
+        if not isinstance(value, datetime.timedelta):
+            raise ValueError("timeout_limit doit être un datetime.timedelta")
+        self.timeout_limit = value
+
+    @property
+    def timeout_subscriber(self):
+        return self.timeout_subscriber
+
+    @timeout_subscriber.setter
+    def timeout_subscriber(self, value):
+        if not isinstance(value, datetime.timedelta):
+            raise ValueError("timeout_subscriber doit être un datetime.timedelta")
+        self.timeout_subscriber = value
+    @property
+    def payment(self):
+        return self.__payments
+    
     def timeout(self):
         """
         PRE: L'objet vehicule est valide et possède un entry_time. 
