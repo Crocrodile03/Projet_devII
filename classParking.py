@@ -2,6 +2,9 @@ import datetime
 from classVehicule import Vehicule
 from classEvent import Event
 from classException import CapacityError, MissingVehiculeError
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import mm
+import os
 
 
 class Parking :
@@ -165,9 +168,10 @@ class Parking :
                     fee = self.maxtarif 
                 else:
                     fee = time_in_parking * self.tarif
-                print(f"Le montant est de {fee} euros.")
+                # print(f"Le montant est de {fee} euros.")
                 return fee
-        raise MissingVehiculeError(f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé dans le parking.")       
+        raise MissingVehiculeError(f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé dans le parking.")
+       
     
     def register_payment(self, amount, methode):
         """
@@ -177,11 +181,59 @@ class Parking :
              methode est une chaîne de caractères valide.
         POST: Un enregistrement de paiement (contenant la date, le montant et la méthode) est ajouté à la liste self.payment.
         """
-        pass
 
-    def generate_report(self):
-        """
-        PRE:
-        POST:
-        """
-        pass
+    def generer_paiement(self,immatriculation, amont, p):
+
+        mois_fr = [
+        "janvier", "février", "mars", "avril", "mai", "juin",
+        "juillet", "août", "septembre", "octobre", "novembre", "décembre"
+    ]
+        current_month = mois_fr[datetime.datetime.now().month - 1]
+        for v in p.parking:
+            if v.immatriculation == immatriculation:
+                time_in_parking = v.get_duration()
+                type_v = v.type_vehicule
+       
+        directory = "paiements"
+        file = f"paiement_{immatriculation}_{current_month}.pdf"
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        file_path = os.path.join(directory, file)
+
+
+        # Format ticket
+        largeur, hauteur = 80 * mm, 150 * mm
+        c = canvas.Canvas(file_path, pagesize=(largeur, hauteur))
+
+        # Décalage vertical pour placer le texte
+        y = hauteur - 10 * mm
+
+        # Titre
+        c.setFont("Helvetica-Bold", 14)
+        c.drawCentredString(largeur / 2, y, "TICKET PARKING")
+        c.drawString(100, 800, "Reçu de Paiement - Parking")
+        
+        y -= 10 * mm
+        # Informations
+        c.setFont("Helvetica", 10)
+
+        c.setFont("Helvetica", 14)
+        c.drawString(5 * mm, y, f"Immatriculation : {immatriculation}")
+        y -= 5 * mm
+        c.drawString(5 * mm, y, f"Type de véhicule : {type_v}")
+        y -= 5 * mm
+        c.drawString(5 * mm, y, f"Date de paiement : {datetime.datetime.now().strftime('%d/%m/%Y')}")
+        y -= 5 * mm
+        c.drawString(5 * mm, y, f"Temps rester dans le parking : {time_in_parking} heures")
+        y -= 5 * mm
+        c.drawString(5 * mm, y, f"Montant : {amont} €")
+        y -= 10 * mm
+
+        c.line(5 * mm, y, largeur - 5 * mm, y)
+        y -= 5 * mm
+
+        # Message bas du ticket
+        c.setFont("Helvetica-Oblique", 9)
+        c.drawCentredString(largeur / 2, y, "Merci de votre visite")
+        c.save()
+        return file_path
