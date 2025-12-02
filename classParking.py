@@ -15,15 +15,14 @@ class Parking :
         # [2]: "électrique" = 4
         # [3]: "abonné" = 12
         self.__max_capacity = (120,6,4,12) # tuples des capacités par type de véhicule
-        self.current_capacity = [0,0,0,0] # liste des capacités par type de véhicule
-        self.parking = [] # liste des objets Vehicule représentants les instances de véhicules garés dans le parking
-        self.opening_hours = "Lundi à Samedi : de 6h00 à 22h00 et Dimanche : de 8h00 à 20h00" 
+        self.__current_capacity = [0,0,0,0] # liste des capacités par type de véhicule
+        self.__parking = [] # liste des objets Vehicule représentants les instances de véhicules garés dans le parking
+        self.__opening_hours = "Lundi à Samedi : de 6h00 à 22h00 et Dimanche : de 8h00 à 20h00" 
         self.__tarif = 1 # euro/heure
         self.__maxtarif = 10 # euro/jour
-        self.tarif_abonnement = 60 # euro/mois
-        self.timeout_limit = datetime.timedelta(hours=24) # 24 heures
-        self.timeout_subriber = datetime.timedelta(hours=24*30) # 30 jours en heures
-        self.payment = [] # liste des transactions de paiement enregistrées
+        self.__tarif_abonnement = 60 # euro/mois
+        self.__timeout_limit = datetime.timedelta(hours=24) # 24 heures
+        self.__timeout_subscriber = datetime.timedelta(hours=24*30) # 30 jours en heures
 
     @property
     def max_capacity(self):
@@ -67,6 +66,36 @@ class Parking :
     def maxtarif(self):
         return self.__maxtarif
 
+    @property
+    def tarif_abonnement(self):
+        return self.__tarif_abonnement
+
+    @tarif_abonnement.setter
+    def tarif_abonnement(self, value):
+        if not isinstance(value, (int, float)) or value < 0:
+            raise ValueError("tarif_abonnement doit être un nombre >= 0")
+        self.__tarif_abonnement = value
+
+    @property
+    def timeout_limit(self):
+        return self.__timeout_limit
+    
+    @timeout_limit.setter
+    def timeout_limit(self, value):
+        if not isinstance(value, datetime.timedelta):
+            raise ValueError("timeout_limit doit être un datetime.timedelta")
+        self.__timeout_limit = value
+
+    @property
+    def timeout_subscriber(self):
+        return self.__timeout_subscriber
+    
+    @timeout_subscriber.setter
+    def timeout_subscriber(self, value):
+        if not isinstance(value, datetime.timedelta):
+            raise ValueError("timeout_subscriber doit être un datetime.timedelta")
+        self.__timeout_subscriber = value
+    
     def timeout(self):
         """
         PRE: L'objet vehicule est valide et possède un entry_time. 
