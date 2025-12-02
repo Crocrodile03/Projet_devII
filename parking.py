@@ -1,13 +1,14 @@
+import os
 import datetime
-from classVehicule import Vehicule
-from classEvent import Event
-from classException import CapacityError, MissingVehiculeError
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import mm
-import os
+from Vehicule import Vehicule
+from event import Event
+from exception import CapacityError, MissingVehiculeError
 
 
 class Parking :
+    """Classe représentant un parking"""
 
     def __init__(self):
         # [0]: "visiteur" = 120
@@ -16,8 +17,8 @@ class Parking :
         # [3]: "abonné" = 12
         self.__max_capacity = (120,6,4,12) # tuples des capacités par type de véhicule
         self.__current_capacity = [0,0,0,0] # liste des capacités par type de véhicule
-        self.__parking = [] # liste des objets Vehicule représentants les instances de véhicules garés dans le parking
-        self.__opening_hours = "Lundi à Samedi : de 6h00 à 22h00 et Dimanche : de 8h00 à 20h00" 
+        self.__parking = [] # liste des instances de véhicules dans le parking
+        self.__opening_hours = "Lundi à Samedi : de 6h00 à 22h00 et Dimanche : de 8h00 à 20h00"
         self.__tarif = 1 # euro/heure
         self.__maxtarif = 10 # euro/jour
         self.__tarif_abonnement = 60 # euro/mois
@@ -26,93 +27,93 @@ class Parking :
 
     @property
     def max_capacity(self):
+        """Get max_capacity"""
         return self.__max_capacity
-      
     @property
     def current_capacity(self):
+        """Get current_capacity"""
         return self.__current_capacity
 
     @current_capacity.setter
     def current_capacity(self, value):
+        """Set current_capacity"""
         if not isinstance(value, list) or len(value) == 0:
             raise ValueError("Le type doit être une liste non vide")
         self.__current_capacity = value
-    
     @property
     def parking(self):
+        """Get parking"""
         return self.__parking
-
     @parking.setter
     def parking(self, value):
+        """Set parking"""
         if not isinstance(value, list):
             raise ValueError("Le type doit être une liste")
         self.__parking = value
-
     @property
     def opening_hours(self):
+        """Get opening_hours"""
         return self.__opening_hours
-
-    @parking.setter
+    @opening_hours.setter
     def opening_hours(self, value):
+        """Set opening_hours"""
         if not isinstance(value, str) or len(value.strip()) == 0:
             raise ValueError("Le type doit être une chaine")
         self.__opening_hours = value
-
     @property
     def tarif(self):
+        """Get tarif"""
         return self.__tarif
-
     @property
     def maxtarif(self):
+        """Get maxtarif"""
         return self.__maxtarif
-
     @property
     def tarif_abonnement(self):
+        """Get tarif_abonnement"""
         return self.__tarif_abonnement
-
     @tarif_abonnement.setter
+
     def tarif_abonnement(self, value):
         if not isinstance(value, (int, float)) or value < 0:
             raise ValueError("tarif_abonnement doit être un nombre >= 0")
         self.__tarif_abonnement = value
-
     @property
     def timeout_limit(self):
+        """Get timeout_limit"""
         return self.__timeout_limit
-    
     @timeout_limit.setter
     def timeout_limit(self, value):
+        """Set timeout_limit"""
         if not isinstance(value, datetime.timedelta):
             raise ValueError("timeout_limit doit être un datetime.timedelta")
         self.__timeout_limit = value
-
     @property
     def timeout_subscriber(self):
+        """Get timeout_subscriber"""
         return self.__timeout_subscriber
-    
     @timeout_subscriber.setter
     def timeout_subscriber(self, value):
+        """Set timeout_subscriber"""
         if not isinstance(value, datetime.timedelta):
             raise ValueError("timeout_subscriber doit être un datetime.timedelta")
         self.__timeout_subscriber = value
-    
     def timeout(self):
         """
         PRE: L'objet vehicule est valide et possède un entry_time. 
         POST: La durée totale de stationnement (un objet timedelta) est calculée. 
               Si cette durée dépasse une limite prédéfinie, une alerte est déclenchée ???
         """
-        if len(self.parking) == 0: 
+        if len(self.parking) == 0:
             print("Le parking est vide")
         now = datetime.datetime.now()
         for v in self.parking:
             temps = now - v.entry_time
             if temps > self.timeout_limit and v.type_vehicule != 'abonné':
-                print(f"Alerte : Le véhicule {v.immatriculation} a dépassé la limite de temps de stationnement.")
-                # return True
-            elif v.type_vehicule == 'abonné' and temps > self.timeout_subriber:
-                print(f"Le véhicule {v.immatriculation} a dépassé la limite de temps de stationnement pour un abonné.")
-                # return True
+                return True
+            if v.type_vehicule == 'abonné' and temps > self.timeout_subscriber:
+                return True
+        return False
 
     def vehicules_entry(self, immatriculation : str, type_vehicule :  str):
         """
