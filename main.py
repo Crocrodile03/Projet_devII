@@ -1,12 +1,9 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
-
-from classParking import Parking
-from classEvent import Event
-from classSubscriber import Subscriber
+from tkinter import ttk # messagebox
 import datetime
+from parking import Parking
+from subscriber import Subscriber
 
-event = Event()
 mon_parking = Parking()
 
 # Palette de couleur

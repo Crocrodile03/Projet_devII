@@ -1,28 +1,15 @@
-class Exception() :
+class InvalidValueError(Exception):
+    def __init__(self, message=""):
+        super().__init__(message)
 
-    def __init__(self):
-        pass
-
-class InvalidValueError(Exception) :
-
-    def __init__(self):
-        super().__init__()
-        pass
-
-class CapacityError(Exception) :
-
-    def __init__(self):
-        super().__init__()
-        pass
+class CapacityError(Exception):
+    def __init__(self, message=""):
+        super().__init__(message)
 
 class MissingVehiculeError(Exception):
-
-    def __init__(self):
-        super().__init__()
-        pass
+    def __init__(self, message=""):
+        super().__init__(message)
 
 class SubscriberConflictError(Exception):
-
-    def __init__(self):
-        super().__init__()
-        pass
+    def __init__(self, message=""):
+        super().__init__(message)
