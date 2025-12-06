@@ -19,7 +19,7 @@ permettant d'interagir avec le système de gestion du parking.
 """
 
 import tkinter as tk
-from tkinter import ttk # messagebox
+from tkinter import ttk, messagebox
 import datetime
 from parking import Parking
 from subscriber import Subscriber
@@ -297,7 +297,11 @@ class EntreeVehicule(tk.Frame):
             self.controller.log_info("Erreur : immatriculation vide.")
             return
         mon_parking.vehicules_entry(immat, type_place)
-        self.controller.log_info(f"Véhicule {immat} entré en place {type_place}.")
+        last_v = len(mon_parking.parking) - 1
+        if mon_parking.parking[last_v].type_vehicule != type_place:
+            messagebox.showwarning("Place pleine",
+                                   f"Attention, il n'y a plus de place {type_place}, vehicule rajouté en place visiteur.")
+        self.controller.log_info(f"Véhicule {immat} entré en place {mon_parking.parking[last_v].type_vehicule}.")
         self.immatriculation_entry.delete(0, tk.END)
         self.type_var.set("visiteur")
 

@@ -190,14 +190,30 @@ class Parking :
             self.parking.append(vehicule)
         elif vehicule.type_vehicule == 'handicapé':
             if self.alert(vehicule.type_vehicule):
-                raise CapacityError(vehicule.type_vehicule)
-            self.current_capacity[1] += 1
-            self.parking.append(vehicule)
+                if self.alert('visiteur'):
+                    """Si plus de place handicapé, on vérifie place visiteur
+                       Si il reste des places visiteur alors on change son type en visiteur
+                    """
+                    raise CapacityError(f"{vehicule.type_vehicule} et visiteur")
+                vehicule.type_vehicule = 'visiteur'
+                self.current_capacity[0] += 1
+                self.parking.append(vehicule)
+            else:
+                self.current_capacity[1] += 1
+                self.parking.append(vehicule)
         elif vehicule.type_vehicule == 'électrique':
             if self.alert(vehicule.type_vehicule):
-                raise CapacityError(vehicule.type_vehicule)
-            self.current_capacity[2] += 1
-            self.parking.append(vehicule)
+                if self.alert('visiteur'):
+                    """Si plus de place électrique, on vérifie place visiteur
+                       Si il reste des places visiteur alors on change son type en visiteur
+                    """
+                    raise CapacityError(f"{vehicule.type_vehicule} et visiteur")
+                vehicule.type_vehicule = 'visiteur'
+                self.current_capacity[0] += 1
+                self.parking.append(vehicule)
+            else:
+                self.current_capacity[2] += 1
+                self.parking.append(vehicule)
         else:
             raise InvalidTypeError
         self.timeout()
