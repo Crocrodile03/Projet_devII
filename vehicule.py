@@ -50,12 +50,12 @@ class Vehicule:
         remainder = seconds % 3600 # le reste
         if remainder > 0:
             print(f"Tu es resté {(hours + 1):.0f} heures dans le parking.")
-            return hours + 1
+            return int(hours + 1)
         # Si le reste est plus grand que 0 ça veut dire que c'est pas une heure pile
         # alors on arrondit à l'heure supérieure
         else:
             print(f"Tu es resté {hours:.0f} heures dans le parking.")
-        return hours
+        return int(hours)
         # Sinon je renvoie le nombre d'heures pile
     def __repr__(self):
         return f"""<Vehicule {self.immatriculation}
