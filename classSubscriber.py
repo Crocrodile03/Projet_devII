@@ -1,7 +1,7 @@
 import datetime
 from classVehicule import Vehicule
 from classEvent import Event
-from classException import CapacityError, SubscriberConflictError, InvalidValueError
+from classException import SubscriberConflictError, InvalidValueError, FullSubscriberCapacityError, VehiculeError
 class Subscriber(Vehicule) :
     """
     Classe héritée de Vehicule et de ses attribus (surtout immatriculation), avec des attribus spécifiques : first_name, last_name, phone_number, subscribe_date, is_subscribe 
@@ -26,7 +26,7 @@ class Subscriber(Vehicule) :
     def first_name(self, value):
         # Changement 10 : Utilisation de InvalidValueError et message précis
         if not isinstance(value, str) or len(value.strip()) == 0:
-            raise InvalidValueError("L'attribut 'first_name' (prénom) doit être une chaîne de caractères non vide.")
+            raise InvalidValueError
         self.__first_name = value
 
     @property
@@ -37,7 +37,7 @@ class Subscriber(Vehicule) :
     def last_name(self, value):
         # Changement 11 : Utilisation de InvalidValueError et message précis
         if not isinstance(value, str) or len(value.strip()) == 0:
-            raise InvalidValueError("L'attribut 'last_name' (nom de famille) doit être une chaîne de caractères non vide.")
+            raise InvalidValueError
         self.__last_name = value
 
     @property
@@ -47,7 +47,7 @@ class Subscriber(Vehicule) :
     @phone_number.setter
     def phone_number(self, value):
         if not isinstance(value, str) or len(value.strip()) == 0:
-            raise InvalidValueError("L'attribut 'phone_number' (numéro de téléphone) doit être une chaîne de caractères non vide.")
+            raise InvalidValueError
         self.__phone_number = value 
 
     @property
@@ -57,22 +57,22 @@ class Subscriber(Vehicule) :
     @subscribe_date.setter
     def subscribe_date(self, value):
         if not isinstance(value, datetime.datetime):
-            raise InvalidValueError("L'attribut 'subscribe_date' doit être un objet datetime.")
+            raise InvalidValueError
         self.__subscribe_date = value
 
 
     def subscribe(self, immatriculation, p, first_name, last_name, phone_number):
         event = Event()
         if event.alert(p.current_capacity[3], p.max_capacity[3], 'abonné'):
-            raise CapacityError("L'enregistrement d'un nouvel abonné est impossible : la capacité maximale pour les abonnés est atteinte.")
+            raise FullSubscriberCapacityError
         else :
             subscriber = Subscriber(immatriculation, first_name, last_name, phone_number, datetime.datetime.now())
             for v in p.parking:
                 if v.immatriculation == subscriber.immatriculation:
                     if v.type_vehicule == "abonné":
-                        raise SubscriberConflictError(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà enregistré comme abonné.")
+                        raise SubscriberConflictError(v.immatriculation)
                     elif v.type_vehicule in ["visiteur", "handicapé", "électrique"]:
-                        raise CapacityError(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking sur une place {v.type_vehicule}.")
+                        raise VehiculeError(v.immatriculation, v.type_vehicule)
             p.parking.append(subscriber)
             p.current_capacity[3] += 1
             print(f"L'abonné {first_name} {last_name} ({immatriculation}) a été ajouté.")

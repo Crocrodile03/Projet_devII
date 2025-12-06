@@ -92,7 +92,7 @@ class Parking :
         if not isinstance(value, datetime.timedelta):
             raise ValueError("timeout_subscriber doit être un datetime.timedelta")
         self.__timeout_subscriber = value
-    
+
     def timeout(self):
         """
         PRE: L'objet vehicule est valide et possède un entry_time. 
@@ -105,9 +105,9 @@ class Parking :
         for v in self.parking:
             temps = now - v.entry_time
             if temps > self.timeout_limit and v.type_vehicule != 'abonné':
-                print(f"Alerte : Le véhicule {v.immatriculation} a dépassé la limite de temps de stationnement.")
+              print(f"Alerte : Le véhicule {v.immatriculation} a dépassé la limite de temps de stationnement.")
                 # return True
-            elif v.type_vehicule == 'abonné' and temps > self.timeout_subriber:
+            elif v.type_vehicule == 'abonné' and temps > self.timeout_subscriber:
                 print(f"Le véhicule {v.immatriculation} a dépassé la limite de temps de stationnement pour un abonné.")
                 # return True
 
@@ -132,25 +132,25 @@ class Parking :
                 else:
                     raise Exception(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking.")
         if event.alert(self.current_capacity[0], self.max_capacity[0]):
-            raise CapacityError("Le parking est plein.")
+            raise CapacityFullError
         else:
             if vehicule.type_vehicule == 'visiteur':
                 self.current_capacity[0] += 1
                 self.parking.append(vehicule)
             elif vehicule.type_vehicule == 'handicapé':
                 if event.alert(self.current_capacity[1], self.max_capacity[1], 'handicapé'):
-                    raise CapacityError("Aucune place handicapé disponible.")
+                    raise CapacityError(vehicule.type_vehicule)
                 else:
                     self.current_capacity[1] += 1
                     self.parking.append(vehicule)
             elif vehicule.type_vehicule == 'électrique':
                 if event.alert(self.current_capacity[2], self.max_capacity[2], 'électrique'):
-                    raise CapacityError("Aucune place électrique disponible.")
+                    raise CapacityError(vehicule.type_vehicule)
                 else:
                     self.current_capacity[2] += 1
                     self.parking.append(vehicule)
             else:
-                raise CapacityError("Type non valide")
+                raise InvalidValueError
         print(vehicule)
         self.timeout()
         # print(self.parking)
@@ -179,7 +179,7 @@ class Parking :
                 self.timeout()
                 # print(self.parking)
                 return True
-        raise MissingVehiculeError(f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé dans le parking.")
+        raise MissingVehiculeError(immatriculation)
     
     def calculate_tarif(self, immatriculation):
         """
@@ -196,7 +196,7 @@ class Parking :
                     fee = time_in_parking * self.tarif
                 print(f"Le montant est de {fee} euros.")
                 return fee
-        raise MissingVehiculeError(f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé dans le parking.")       
+        raise MissingVehiculeError(immatriculation)       
     
     def register_payment(self, amount, methode):
         """
