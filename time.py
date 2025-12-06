@@ -1,4 +1,4 @@
-from classParking import Parking
+from parking import Parking
 
 
 mon_parking = Parking()
