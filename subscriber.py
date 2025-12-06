@@ -13,7 +13,7 @@ Imports :
 """
 import datetime
 from vehicule import Vehicule
-from exception import CapacityError, SubscriberConflictError, InvalidValueError
+from exception import CapacityError, SubscriberConflictError, FullSubscriberCapacityError, InvalidValueSubscriberError
 
 class Subscriber(Vehicule) :
     """
@@ -41,8 +41,7 @@ class Subscriber(Vehicule) :
         """Set le prénom de l'abonné."""
         # Changement 10 : Utilisation de InvalidValueError et message précis
         if not isinstance(value, str) or len(value.strip()) == 0:
-            raise InvalidValueError(
-                "L'attribut 'first_name' doit être une chaîne de caractères non vide.")
+            raise InvalidValueSubscriberError("prénom", value)
         self.__first_name = value
 
     @property
@@ -54,8 +53,7 @@ class Subscriber(Vehicule) :
         """Set le nom de famille de l'abonné."""
         # Changement 11 : Utilisation de InvalidValueError et message précis
         if not isinstance(value, str) or len(value.strip()) == 0:
-            raise InvalidValueError(
-                "L'attribut 'last_name' doit être une chaîne de caractères non vide.")
+            raise InvalidValueSubscriberError("nom", value)
         self.__last_name = value
 
     @property
@@ -67,8 +65,7 @@ class Subscriber(Vehicule) :
     def phone_number(self, value):
         """Set le numéro de téléphone de l'abonné."""
         if not isinstance(value, str) or len(value.strip()) == 0:
-            raise InvalidValueError("" \
-            "L'attribut 'phone_number' doit être une chaîne de caractères non vide.")
+            raise InvalidValueSubscriberError("numéro de téléphone", value)
         self.__phone_number = value
     @property
     def tarif_abonnement(self):
@@ -78,7 +75,7 @@ class Subscriber(Vehicule) :
 
     def tarif_abonnement(self, value):
         if not isinstance(value, (int, float)) or value < 0:
-            raise ValueError("tarif_abonnement doit être un nombre >= 0")
+            raise InvalidValueSubscriberError("tarif d'abonnement",value)
         self.__tarif_abonnement = value
 
     def subscribe(self, p):
@@ -89,16 +86,13 @@ class Subscriber(Vehicule) :
         Lève CapacityError si la capacité maximale pour les abonnés est atteinte.
         """
         if p.alert('abonné'):
-            raise CapacityError("""L'enregistrement d'un nouvel abonné est impossible:
-                                la capacité maximale pour les abonnés est atteinte.""")
+            raise FullSubscriberCapacityError
         for v in p.parking:
             if v.immatriculation == self.immatriculation:
                 if v.type_vehicule == "abonné":
-                    raise SubscriberConflictError(
-                        f"Véhicule {v.immatriculation} est déjà abonné.")
+                    raise SubscriberConflictError(v.immatriculation)
                 if v.type_vehicule in ["visiteur", "handicapé", "électrique"]:
-                    raise CapacityError(
-                        f"Véhicule {v.immatriculation} est déjà sur une place {v.type_vehicule}.")
+                    raise CapacityError(v.type_vehicule)
         p.parking.append(self)
         p.current_capacity[3] += 1
         print(f"L'abonné {self.first_name} {self.last_name} ({self.immatriculation}) a été ajouté.")

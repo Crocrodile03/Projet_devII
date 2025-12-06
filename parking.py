@@ -22,7 +22,7 @@ import datetime
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import mm
 from vehicule import Vehicule
-from exception import CapacityError, MissingVehiculeError
+from exception import CapacityError, MissingVehiculeError, InvalidTypeError,VehiculeError, SubscriberConflictError
 
 
 class Parking :
@@ -126,7 +126,8 @@ class Parking :
         """
         PRE: Les capacités sont des nombres entiers non négatifs. 
              current_capacity est inférieur ou égal à max_capacity. 
-        POST: Retourne True si une alerte est déclenchée, False sinon.
+        POST: Retourne True si les places d'un type donnés sont pleines.
+            sinon il retourne False.
         """
         if (type_v == 'visiteur' and
             self.current_capacity[0] >= self.max_capacity[0]):
@@ -180,27 +181,25 @@ class Parking :
         for v in self.parking:
             if v.immatriculation == vehicule.immatriculation:
                 if v.type_vehicule == "abonné":
-                    raise Exception(
-                        f"L'immatriculation {v.immatriculation} appartient à un abonné")
-                raise Exception(
-                    f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking.")
+                    raise SubscriberConflictError(v.immatriculation)
+                raise VehiculeError(v.immatriculation, v.type_vehicule)
         if vehicule.type_vehicule == 'visiteur':
             if self.alert(vehicule.type_vehicule):
-                raise CapacityError(f"Il n'y a plus de place {type_vehicule} disponible.")
+                raise CapacityError(vehicule.type_vehicule)
             self.current_capacity[0] += 1
             self.parking.append(vehicule)
         elif vehicule.type_vehicule == 'handicapé':
             if self.alert(vehicule.type_vehicule):
-                raise CapacityError(f"Il n'y a plus de place {type_vehicule} disponible.")
+                raise CapacityError(vehicule.type_vehicule)
             self.current_capacity[1] += 1
             self.parking.append(vehicule)
         elif vehicule.type_vehicule == 'électrique':
             if self.alert(vehicule.type_vehicule):
-                raise CapacityError(f"Il n'y a plus de place {type_vehicule} disponible.")
+                raise CapacityError(vehicule.type_vehicule)
             self.current_capacity[2] += 1
             self.parking.append(vehicule)
         else:
-            raise CapacityError("Type non valide")
+            raise InvalidTypeError
         self.timeout()
         # print(self.parking)
         return vehicule
@@ -231,8 +230,7 @@ class Parking :
                 self.timeout()
                 # print(self.parking)
                 return True
-        raise MissingVehiculeError(
-            f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé.")
+        raise MissingVehiculeError(immatriculation)
     def calculate_tarif(self, immatriculation):
         """
         Paramètre : vehicule; Type : Vehicule; Description : Instance de vehicule
@@ -248,8 +246,7 @@ class Parking :
                     fee = time_in_parking * self.tarif
                 # print(f"Le montant est de {fee} euros.")
                 return fee
-        raise MissingVehiculeError(
-            f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé.")
+        raise MissingVehiculeError(immatriculation)
     def generer_paiement(self,immatriculation, p, amont):
         """
         Paramètre : immatriculation; Type : str;
