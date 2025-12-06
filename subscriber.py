@@ -31,6 +31,7 @@ class Subscriber(Vehicule) :
         self.__first_name = first_name
         self.__last_name = last_name
         self.__phone_number = phone_number
+        self.__tarif_abonnement = 60 # euro/mois
     @property
     def first_name(self):
         """Get le prénom de l'abonné."""
@@ -40,7 +41,8 @@ class Subscriber(Vehicule) :
         """Set le prénom de l'abonné."""
         # Changement 10 : Utilisation de InvalidValueError et message précis
         if not isinstance(value, str) or len(value.strip()) == 0:
-            raise InvalidValueError("L'attribut 'first_name' (prénom) doit être une chaîne de caractères non vide.")
+            raise InvalidValueError(
+                "L'attribut 'first_name' doit être une chaîne de caractères non vide.")
         self.__first_name = value
 
     @property
@@ -52,7 +54,8 @@ class Subscriber(Vehicule) :
         """Set le nom de famille de l'abonné."""
         # Changement 11 : Utilisation de InvalidValueError et message précis
         if not isinstance(value, str) or len(value.strip()) == 0:
-            raise InvalidValueError("L'attribut 'last_name' (nom de famille) doit être une chaîne de caractères non vide.")
+            raise InvalidValueError(
+                "L'attribut 'last_name' doit être une chaîne de caractères non vide.")
         self.__last_name = value
 
     @property
@@ -64,8 +67,19 @@ class Subscriber(Vehicule) :
     def phone_number(self, value):
         """Set le numéro de téléphone de l'abonné."""
         if not isinstance(value, str) or len(value.strip()) == 0:
-            raise InvalidValueError("L'attribut 'phone_number' (numéro de téléphone) doit être une chaîne de caractères non vide.")
+            raise InvalidValueError("" \
+            "L'attribut 'phone_number' doit être une chaîne de caractères non vide.")
         self.__phone_number = value
+    @property
+    def tarif_abonnement(self):
+        """Get tarif_abonnement"""
+        return self.__tarif_abonnement
+    @tarif_abonnement.setter
+
+    def tarif_abonnement(self, value):
+        if not isinstance(value, (int, float)) or value < 0:
+            raise ValueError("tarif_abonnement doit être un nombre >= 0")
+        self.__tarif_abonnement = value
 
     def subscribe(self, p):
         """PRE: immatriculation est une chaîne de caractères valide.
@@ -80,16 +94,18 @@ class Subscriber(Vehicule) :
         for v in p.parking:
             if v.immatriculation == self.immatriculation:
                 if v.type_vehicule == "abonné":
-                    raise SubscriberConflictError(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà enregistré comme abonné.")
+                    raise SubscriberConflictError(
+                        f"Véhicule {v.immatriculation} est déjà abonné.")
                 if v.type_vehicule in ["visiteur", "handicapé", "électrique"]:
-                    raise CapacityError(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking sur une place {v.type_vehicule}.")
+                    raise CapacityError(
+                        f"Véhicule {v.immatriculation} est déjà sur une place {v.type_vehicule}.")
         p.parking.append(self)
         p.current_capacity[3] += 1
-        print(f"L'abonné {self.first_name} {self.last_name} ({self.immatriculation}) a été ajouté.")         
+        print(f"L'abonné {self.first_name} {self.last_name} ({self.immatriculation}) a été ajouté.")
     def calculate_subscribe_fee(self):
         """
-        PRE: 
-        POST:
+        PRE: Aucun prérequis spécifique. 
+        POST: Renvoie le montant fixe de l'abonnement annuel pour un abonné.
+        60 euros est le tarif fixe pour l'abonnement annuel.
         """
-        print(f"L'abonné {self.immatriculation} doit payer son abonnement annuel qui est de .")
-        return 60  # Tarif fixe pour l'abonnement annuel
+        return self.tarif_abonnement  # Tarif fixe pour l'abonnement annuel

@@ -1,3 +1,8 @@
+"""
+Module initialisant les importations nécessaires, incluant le module standard
+`datetime` pour la gestion et la manipulation des dates et heures dans
+l'application.
+"""
 import datetime
 from datetime import datetime
 

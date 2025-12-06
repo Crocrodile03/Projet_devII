@@ -39,7 +39,6 @@ class Parking :
         self.__opening_hours = "Lundi à Samedi : de 6h00 à 22h00 et Dimanche : de 8h00 à 20h00"
         self.__tarif = 1 # euro/heure
         self.__maxtarif = 10 # euro/jour
-        self.__tarif_abonnement = 60 # euro/mois
         self.__timeout_limit = datetime.timedelta(hours=24) # 24 heures
         self.__timeout_subscriber = datetime.timedelta(hours=24*30) # 30 jours en heures
 
@@ -86,16 +85,6 @@ class Parking :
     def maxtarif(self):
         """Get maxtarif"""
         return self.__maxtarif
-    @property
-    def tarif_abonnement(self):
-        """Get tarif_abonnement"""
-        return self.__tarif_abonnement
-    @tarif_abonnement.setter
-
-    def tarif_abonnement(self, value):
-        if not isinstance(value, (int, float)) or value < 0:
-            raise ValueError("tarif_abonnement doit être un nombre >= 0")
-        self.__tarif_abonnement = value
     @property
     def timeout_limit(self):
         """Get timeout_limit"""
@@ -191,8 +180,10 @@ class Parking :
         for v in self.parking:
             if v.immatriculation == vehicule.immatriculation:
                 if v.type_vehicule == "abonné":
-                    raise Exception(f"L'immatriculation {v.immatriculation} appartient à un abonné")
-                raise Exception(f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking.")
+                    raise Exception(
+                        f"L'immatriculation {v.immatriculation} appartient à un abonné")
+                raise Exception(
+                    f"Le véhicule avec l'immatriculation {v.immatriculation} est déjà dans le parking.")
         if vehicule.type_vehicule == 'visiteur':
             if self.alert(vehicule.type_vehicule):
                 raise CapacityError(f"Il n'y a plus de place {type_vehicule} disponible.")
@@ -240,7 +231,8 @@ class Parking :
                 self.timeout()
                 # print(self.parking)
                 return True
-        raise MissingVehiculeError(f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé dans le parking.")
+        raise MissingVehiculeError(
+            f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé.")
     def calculate_tarif(self, immatriculation):
         """
         Paramètre : vehicule; Type : Vehicule; Description : Instance de vehicule
@@ -256,7 +248,8 @@ class Parking :
                     fee = time_in_parking * self.tarif
                 # print(f"Le montant est de {fee} euros.")
                 return fee
-        raise MissingVehiculeError(f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé dans le parking.") 
+        raise MissingVehiculeError(
+            f"Aucun véhicule avec l'immatriculation {immatriculation} n'a été trouvé.")
     def generer_paiement(self,immatriculation, p, amont):
         """
         Paramètre : immatriculation; Type : str;
@@ -267,8 +260,12 @@ class Parking :
             Description : montant total à payer.
         PRE: L'immatriculation est valide et associée à une instance de Vehicule dans p.
              amont est un float >= 0.
-        POST: Un ticket de paiement au format PDF est généré et sauvegardé dans le répertoire "paiements".
-              Le ticket contient les informations d'immatriculation, type de véhicule, date de paiement, temps passé dans le parking et montant payé.
+        POST: Un ticket de paiement au format PDF est généré
+        et sauvegardé dans le répertoire "paiements".
+              Le ticket contient les informations d'immatriculation,
+              type de véhicule,
+              date de paiement,
+              temps passé dans le parking et montant payé.
               Le chemin du fichier PDF est retourné.
         Exceptions: Lève une exception si l'immatriculation n'est pas trouvée dans p.
         """
