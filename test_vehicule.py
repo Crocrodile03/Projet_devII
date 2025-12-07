@@ -1,7 +1,6 @@
 import unittest
 from datetime import datetime, timedelta
 from vehicule import Vehicule
-import time
 
 class TestVehicule(unittest.TestCase):
 #héritage de unittest.TestCase pour que chaque test soit indépe
