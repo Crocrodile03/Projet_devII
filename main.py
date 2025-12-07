@@ -29,6 +29,9 @@ mon_parking = Parking()
 # Palette de couleur
 COLOR_BG = "#344e41"      # Vert foncé
 COLOR_BTN = "#588157"     # Vert moyen pour boutons
+COLOR_PV = "#12b000"      # Vert foncé pour parking à -50% de place libre
+COLOR_PM = "#ff8400"      # Orange pour parking à +50% de place libre
+COLOR_PP = "#ff0008"      # Rouge pour parking à +75% de place libre
 COLOR_BTN_HOVER = "#5a9758" # Vert clair sur hover
 COLOR_LABEL = "#bbd58e"   # Vert clair pour labels/log
 COLOR_ENTRY = "#3a5a40"  # Vert très clair (fond entrée)
@@ -51,6 +54,21 @@ class Application(tk.Tk):
     Elle gère également la navigation entre les pages et la mise à jour
     périodique de l'affichage de l'état du parking.
     """
+
+    @staticmethod
+    def couleur_pourcentage(actuel, total):
+        if total == 0:
+            return COLOR_PV
+
+        taux = actuel / total
+
+        if taux >= 0.75:
+            return COLOR_PP
+        elif taux >= 0.5:
+            return COLOR_PM
+        else:
+            return COLOR_PV
+
     def __init__(self):
         super().__init__()
         self.title("Gestionnaire de Parking")
@@ -58,30 +76,41 @@ class Application(tk.Tk):
 
         self.config(bg=COLOR_BG)
 
-        # --- État du parking ---
         sidebar = tk.Frame(self,
                            width=400,
                            bg=COLOR_BG,
                            relief="sunken",
                            bd=2)
-        sidebar.pack(side="right",
-                     fill="both")
+        sidebar.pack(side="right", fill="y")
 
-        tk.Label(sidebar, text="État du parking",
+        tk.Label(sidebar,
+                 text="État du parking",
                  font=("Arial", 14, "bold"),
                  bg=COLOR_BG,
                  fg="white").pack(pady=10)
-        self.sidebar_label = tk.Label(sidebar,
-                                      text="",
-                                      font=("Arial", 12),
-                                      bg=COLOR_LABEL,
-                                      justify="left")
-        self.sidebar_label.pack(pady=10,
-                                padx=5,
-                                fill="both")
+
+        frame_etat = tk.Frame(sidebar, bg=COLOR_BG)
+        frame_etat.pack(fill="x", padx=10)
+
+        # --- État du parking ---
+        self.label_visiteurs = tk.Label(frame_etat, font=("Arial", 12),
+                                        bg=COLOR_LABEL, anchor="w")
+        self.label_handicapes = tk.Label(frame_etat, font=("Arial", 12),
+                                         bg=COLOR_LABEL, anchor="w")
+        self.label_electriques = tk.Label(frame_etat, font=("Arial", 12),
+                                          bg=COLOR_LABEL, anchor="w")
+        self.label_abonnes = tk.Label(frame_etat, font=("Arial", 12),
+                                      bg=COLOR_LABEL, anchor="w")
+
+        self.label_visiteurs.pack(fill="x", pady=3)
+        self.label_handicapes.pack(fill="x", pady=3)
+        self.label_electriques.pack(fill="x", pady=3)
+        self.label_abonnes.pack(fill="x", pady=3)
+
 
         # --- FRAME PRINCIPAL ---
         main_container = tk.Frame(self,
+                                  height=120,
                                   bg=COLOR_BG)
         main_container.pack(side="right",
                             fill="both",
@@ -151,14 +180,27 @@ class Application(tk.Tk):
         puis met à jour l’étiquette correspondante. Elle se rappelle
         automatiquement toutes les 500 ms pour assurer une mise à jour continue.
         """
+        # Récupération des capacités actuelles
         v, h, e, a = mon_parking.current_capacity
-        texte = (
-            f"Visiteurs : {v}\n"
-            f"Handicapés : {h}\n"
-            f"Électriques : {e}\n"
-            f"Abonnés : {a}"
-        )
-        self.sidebar_label.config(text=texte)
+
+        # Capacités totales
+        tot_v = mon_parking.max_capacity[0]
+        tot_h = mon_parking.max_capacity[1]
+        tot_e = mon_parking.max_capacity[2]
+        tot_a = mon_parking.max_capacity[3]
+
+        # Couleurs dynamiques selon le pourcentage
+        color_v = self.couleur_pourcentage(v, tot_v)
+        color_h = self.couleur_pourcentage(h, tot_h)
+        color_e = self.couleur_pourcentage(e, tot_e)
+        color_a = self.couleur_pourcentage(a, tot_a)
+
+        # Mise à jour des labels
+        self.label_visiteurs.config(text=f"Visiteurs : {v}/{tot_v}", fg=color_v)
+        self.label_handicapes.config(text=f"Handicapés : {h}/{tot_h}", fg=color_h)
+        self.label_electriques.config(text=f"Électriques : {e}/{tot_e}", fg=color_e)
+        self.label_abonnes.config(text=f"Abonnés : {a}/{tot_a}", fg=color_a)
+
         self.after(500, self.update_sidebar)
 
     def log_info(self, msg):
@@ -220,8 +262,6 @@ class MenuPrincipal(tk.Frame):
         ttk.Button(self,
                    text="Quitter",
                    command=controller.quit).pack(pady=20)
-
-
 # ============================================================
 # ENTRÉE VEHICULE
 # ============================================================
