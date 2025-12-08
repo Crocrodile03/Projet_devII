@@ -25,6 +25,7 @@ from parking import Parking
 from subscriber import Subscriber
 
 mon_parking = Parking()
+mon_parking.load_state()
 
 # Palette de couleur
 COLOR_BG = "#344e41"      # Vert foncé
@@ -73,6 +74,7 @@ class Application(tk.Tk):
         super().__init__()
         self.title("Gestionnaire de Parking")
         self.geometry("1920x1080")  # espace pour sidebar et log
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         self.config(bg=COLOR_BG)
 
@@ -160,6 +162,7 @@ class Application(tk.Tk):
 
         # Démarrer la mise à jour de la barre d'état
         self.update_sidebar()
+        
 
     def show_frame(self, page):
         """
@@ -216,6 +219,14 @@ class Application(tk.Tk):
                              f"[{timestamp}] {msg}\n")
         self.log_text.see("end")
         self.log_text.config(state="disabled")
+
+    def quit(self):
+        """Surcharge de la méthode quit pour assurer la sauvegarde."""
+        self.on_closing()
+
+    def on_closing(self):
+        mon_parking.save_state()
+        self.destroy()
 
 # ============================================================
 # MENU PRINCIPAL
