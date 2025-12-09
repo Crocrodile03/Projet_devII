@@ -58,6 +58,7 @@ class Application(tk.Tk):
 
     @staticmethod
     def couleur_pourcentage(actuel, total):
+        """Change la couleur en fonction du pourcentage de places occupées."""
         if total == 0:
             return COLOR_PV
 
@@ -162,7 +163,6 @@ class Application(tk.Tk):
 
         # Démarrer la mise à jour de la barre d'état
         self.update_sidebar()
-        
 
     def show_frame(self, page):
         """
@@ -225,6 +225,7 @@ class Application(tk.Tk):
         self.on_closing()
 
     def on_closing(self):
+        """Gère la fermeture de l'application en sauvegardant l'état du parking."""
         mon_parking.save_state()
         self.destroy()
 
@@ -351,8 +352,9 @@ class EntreeVehicule(tk.Frame):
         last_v = len(mon_parking.parking) - 1
         if mon_parking.parking[last_v].type_vehicule != type_place:
             messagebox.showwarning("Place pleine",
-                                   f"Attention, il n'y a plus de place {type_place}, vehicule rajouté en place visiteur.")
-        self.controller.log_info(f"Véhicule {immat} entré en place {mon_parking.parking[last_v].type_vehicule}.")
+            f"Attention, il n'y a plus de place {type_place}, vehicule rajouté en place visiteur.")
+        self.controller.log_info(
+            f"Véhicule {immat} entré en place {mon_parking.parking[last_v].type_vehicule}.")
         self.immatriculation_entry.delete(0, tk.END)
         self.type_var.set("visiteur")
 

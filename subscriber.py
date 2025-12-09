@@ -12,8 +12,10 @@ Imports :
       valeurs invalides fournies aux méthodes.
 """
 import datetime
+from datetime import datetime
 from vehicule import Vehicule
-from exception import CapacityError, SubscriberConflictError, FullSubscriberCapacityError, InvalidValueSubscriberError
+from exception import (CapacityError, SubscriberConflictError, FullSubscriberCapacityError,
+                       InvalidValueSubscriberError)
 
 class Subscriber(Vehicule) :
     """
@@ -26,8 +28,9 @@ class Subscriber(Vehicule) :
     POST: Un nouvel objet Subscribe est créé, héritant de Vehicule (en utilisant un type 'abonné'). 
           Les attributs spécifiques à l'abonné sont définis.
     """
-    def __init__(self,immatriculation: str,first_name: str,last_name: str,phone_number: str):
-        super().__init__(immatriculation,type_vehicule="abonné",entry_time=datetime.datetime.now())
+    def __init__(self,immatriculation: str,first_name: str,last_name: str,
+                 phone_number: str,entry_time: datetime=datetime.now()):
+        super().__init__(immatriculation,type_vehicule="abonné",entry_time=datetime.now())
         self.__first_name = first_name
         self.__last_name = last_name
         self.__phone_number = phone_number
@@ -103,32 +106,24 @@ class Subscriber(Vehicule) :
         60 euros est le tarif fixe pour l'abonnement annuel.
         """
         return self.tarif_abonnement  # Tarif fixe pour l'abonnement annuel
-    
+
     def to_dict(self):
-        data = super().to_dict() 
+        data = super().to_dict()
         data.update({
             "first_name": self.__first_name,
             "last_name": self.__last_name,
             "phone_number": self.__phone_number,
-            "subscribe_date": self.__subscribe_date.isoformat(),
-            "is_subscribe": self.__is_subscribe,
-            "tarif_abonnement": self.__tarif_abonnement
+            # "tarif_abonnement": self.__tarif_abonnement
         })
         return data
 
+    @staticmethod
     def from_dict(data):
-        entry_time = datetime.fromisoformat(data["entry_time"]) 
-        subscribe_date = datetime.fromisoformat(data["subscribe_date"]) 
-
+        entry_time = datetime.fromisoformat(data["entry_time"])
         subscriber = Subscriber(
             data["immatriculation"],
             data["first_name"],
             data["last_name"],
             data["phone_number"],
-            entry_time=entry_time,
-            subscribe_date=subscribe_date
-        )
-        subscriber.is_subscribe = data["is_subscribe"]
-        subscriber.tarif_abonnement = data["tarif_abonnement"] 
-        
+            entry_time)
         return subscriber

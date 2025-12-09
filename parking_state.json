@@ -19,12 +19,45 @@
             "immatriculation": "Hawkins",
             "entry_time": "2025-12-09T00:49:24.733908",
             "type_vehicule": "\u00e9lectrique"
+        },
+        {
+            "immatriculation": "Salut",
+            "entry_time": "2025-12-09T13:17:16.252218",
+            "type_vehicule": "\u00e9lectrique"
+        },
+        {
+            "immatriculation": "AuRevoir",
+            "entry_time": "2025-12-09T13:17:22.545941",
+            "type_vehicule": "visiteur"
+        },
+        {
+            "immatriculation": "Null",
+            "entry_time": "2025-12-09T13:17:29.121880",
+            "type_vehicule": "\u00e9lectrique"
+        },
+        {
+            "immatriculation": "coucou",
+            "entry_time": "2025-12-09T13:17:37.107723",
+            "type_vehicule": "\u00e9lectrique"
+        },
+        {
+            "immatriculation": "YO",
+            "entry_time": "2025-12-09T13:17:44.532942",
+            "type_vehicule": "visiteur"
+        },
+        {
+            "immatriculation": "GAY-LOR",
+            "entry_time": "2025-12-09T15:04:06.730034",
+            "type_vehicule": "abonn\u00e9",
+            "first_name": "Gaylor",
+            "last_name": "Lamand",
+            "phone_number": "+32479455634"
         }
     ],
     "current_capacity": [
-        2,
+        4,
         1,
-        1,
-        0
+        4,
+        1
     ]
 }

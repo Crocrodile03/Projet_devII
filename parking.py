@@ -24,7 +24,8 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import mm
 from vehicule import Vehicule
 from subscriber import Subscriber
-from exception import CapacityError, MissingVehiculeError, InvalidTypeError,VehiculeError, SubscriberConflictError, FailToLoad
+from exception import (CapacityError, MissingVehiculeError, InvalidTypeError,
+                       VehiculeError, SubscriberConflictError, FailToLoad)
 
 
 class Parking :
@@ -38,7 +39,7 @@ class Parking :
         self.__max_capacity = (120,6,4,12) # tuples des capacités par type de véhicule
         self.__current_capacity = [0,0,0,0] # liste des capacités par type de véhicule
         self.__parking = [] # liste des instances de véhicules dans le parking
-        self.__opening_hours = "Lundi à Samedi : de 6h00 à 22h00 et Dimanche : de 8h00 à 20h00"
+        # "Lundi à Samedi : de 6h00 à 22h00 et Dimanche : de 8h00 à 20h00"
         self.__tarif = 1 # euro/heure
         self.__maxtarif = 10 # euro/jour
         self.__timeout_limit = datetime.timedelta(hours=24) # 24 heures
@@ -69,16 +70,6 @@ class Parking :
         if not isinstance(value, list):
             raise ValueError("Le type doit être une liste")
         self.__parking = value
-    @property
-    def opening_hours(self):
-        """Get opening_hours"""
-        return self.__opening_hours
-    @opening_hours.setter
-    def opening_hours(self, value):
-        """Set opening_hours"""
-        if not isinstance(value, str) or len(value.strip()) == 0:
-            raise ValueError("Le type doit être une chaine")
-        self.__opening_hours = value
     @property
     def tarif(self):
         """Get tarif"""
@@ -193,9 +184,8 @@ class Parking :
         elif vehicule.type_vehicule == 'handicapé':
             if self.alert(vehicule.type_vehicule):
                 if self.alert('visiteur'):
-                    """Si plus de place handicapé, on vérifie place visiteur
-                       Si il reste des places visiteur alors on change son type en visiteur
-                    """
+                    # Si plus de place handicapé, on vérifie place visiteur
+                    # Si il reste des places visiteur alors on change son type en visiteur
                     raise CapacityError(f"{vehicule.type_vehicule} et visiteur")
                 vehicule.type_vehicule = 'visiteur'
                 self.current_capacity[0] += 1
@@ -206,9 +196,8 @@ class Parking :
         elif vehicule.type_vehicule == 'électrique':
             if self.alert(vehicule.type_vehicule):
                 if self.alert('visiteur'):
-                    """Si plus de place électrique, on vérifie place visiteur
-                       Si il reste des places visiteur alors on change son type en visiteur
-                    """
+                    # Si plus de place électrique, on vérifie place visiteur
+                    # Si il reste des places visiteur alors on change son type en visiteur
                     raise CapacityError(f"{vehicule.type_vehicule} et visiteur")
                 vehicule.type_vehicule = 'visiteur'
                 self.current_capacity[0] += 1
@@ -219,9 +208,7 @@ class Parking :
         else:
             raise InvalidTypeError
         self.timeout()
-        # print(self.parking)
         return vehicule
-
 
     def vehicules_leave(self, immatriculation):
         """
@@ -246,10 +233,9 @@ class Parking :
                     self.current_capacity[2] -= 1
                 print(f"Le véhicule avec l'immatriculation {immatriculation} est sorti du parking.")
                 self.timeout()
-                # print(self.parking)
                 return True
         raise MissingVehiculeError(immatriculation)
-    
+
     def save_state(self, filename="parking_state.json"):
         """Sauvegarde l'état actuel du parking (véhicules et capacités) dans un fichier JSON."""
         parking_data = {
@@ -258,7 +244,7 @@ class Parking :
         }
 
         try:
-            with open(filename, 'w') as f:
+            with open(filename, 'w', encoding='utf-8') as f:
                 json.dump(parking_data, f, indent=4)
             print(f"État du parking sauvegardé dans {filename}.")
         except FailToLoad :
@@ -266,31 +252,30 @@ class Parking :
 
     def load_state(self, filename="parking_state.json"):
         """Charge l'état du parking depuis un fichier JSON au démarrage."""
-        
+
         if not os.path.exists(filename):
             print("Aucun fichier de sauvegarde trouvé. Démarrage à vide.")
             return
 
         try:
-            with open(filename, 'r') as f:
+            with open(filename, 'r', encoding="utf-8") as f:
                 f.seek(0, os.SEEK_END)
-                if f.tell() == 0: 
+                if f.tell() == 0:
                     print(f"Le fichier de sauvegarde '{filename}' est vide. Démarrage à vide.")
                     return
                 f.seek(0)
-                parking_data = json.load(f) 
+                parking_data = json.load(f)
 
             self.__current_capacity = parking_data.get("current_capacity", [0, 0, 0, 0])
             loaded_vehicles = []
             for v_data in parking_data.get("parking", []):
-                type_vehicule = v_data.get("type_vehicule", "visiteur")  
+                type_vehicule = v_data.get("type_vehicule", "visiteur")
                 if type_vehicule == "abonné":
                     loaded_vehicles.append(Subscriber.from_dict(v_data))
                 else:
                     loaded_vehicles.append(Vehicule.from_dict(v_data))
-                
             self.__parking = loaded_vehicles
-        
+
         except json.JSONDecodeError as e:
             print(f"Erreur lors du décodage JSON du fichier de sauvegarde : {e}. Démarrage à vide.")
             self.__current_capacity = [0, 0, 0, 0]
@@ -298,8 +283,9 @@ class Parking :
         except FailToLoad :
             self.__current_capacity = [0, 0, 0, 0]
             self.__parking = []
-    
+
     def calculate_tarif(self, immatriculation):
+        """Calcule le tarif à payer pour un véhicule donné en fonction de son immatriculation."""
         for v in self.parking:
             if v.immatriculation == immatriculation:
                 time_in_parking = v.get_duration()
@@ -337,7 +323,6 @@ class Parking :
         "janvier", "février", "mars", "avril", "mai", "juin",
         "juillet", "août", "septembre", "octobre", "novembre", "décembre"
     ]
-        current_month = mois_fr[datetime.datetime.now().month - 1]
         type_v = ""
         time_in_parking = 0
         for v in p:
@@ -345,7 +330,7 @@ class Parking :
                 time_in_parking = v.get_duration()
                 type_v = v.type_vehicule
         directory = "paiements"
-        file = f"paiement_{immatriculation}_{current_month}.pdf"
+        file = f"paiement_{immatriculation}_{mois_fr[datetime.datetime.now().month - 1]}.pdf"
         if not os.path.exists(directory):
             os.makedirs(directory)
         file_path = os.path.join(directory, file)
