@@ -20,9 +20,10 @@ Imports :
 import os
 import datetime
 import json
-# from reportlab.pdfgen import canvas
-# from reportlab.lib.pagesizes import mm
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import mm
 from vehicule import Vehicule
+from subscriber import Subscriber
 from exception import CapacityError, MissingVehiculeError, InvalidTypeError,VehiculeError, SubscriberConflictError, FailToLoad
 
 
@@ -280,11 +281,15 @@ class Parking :
                 parking_data = json.load(f) 
 
             self.__current_capacity = parking_data.get("current_capacity", [0, 0, 0, 0])
-            self.__parking = [Vehicule.from_dict(v_data) 
-                              for v_data in parking_data.get("parking", [])] 
-            
-            print(f"État du parking chargé depuis {filename}.")
-            print(self.__parking)
+            loaded_vehicles = []
+            for v_data in parking_data.get("parking", []):
+                type_vehicule = v_data.get("type_vehicule", "visiteur")  
+                if type_vehicule == "abonné":
+                    loaded_vehicles.append(Subscriber.from_dict(v_data))
+                else:
+                    loaded_vehicles.append(Vehicule.from_dict(v_data))
+                
+            self.__parking = loaded_vehicles
         
         except json.JSONDecodeError as e:
             print(f"Erreur lors du décodage JSON du fichier de sauvegarde : {e}. Démarrage à vide.")

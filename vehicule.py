@@ -46,7 +46,6 @@ class Vehicule:
     def to_dict(self):
         return {
             "immatriculation": self.__immatriculation,
-            # Convertir datetime en chaîne ISO 8601
             "entry_time": self.__entry_time.isoformat(), 
             "type_vehicule": self.__type_vehicule
         }
