@@ -39,3 +39,7 @@ class InvalidTypeError(MyException):
 class InvalidValueSubscriberError(MyException):
     def __init__(self, input_sub, value):
         self.message = f"Le {input_sub} n'est pas valide : {value}."
+
+class FailToLoad(MyException):
+    def __init__(self):
+        self.message = f"Erreur lors de la sauvegarde"

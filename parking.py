@@ -19,10 +19,12 @@ Imports :
 """
 import os
 import datetime
+import json
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import mm
 from vehicule import Vehicule
-from exception import CapacityError, MissingVehiculeError, InvalidTypeError,VehiculeError, SubscriberConflictError
+from subscriber import Subscriber
+from exception import CapacityError, MissingVehiculeError, InvalidTypeError,VehiculeError, SubscriberConflictError, FailToLoad
 
 
 class Parking :
@@ -247,7 +249,56 @@ class Parking :
                 # print(self.parking)
                 return True
         raise MissingVehiculeError(immatriculation)
+    
+    def save_state(self, filename="parking_state.json"):
+        """Sauvegarde l'état actuel du parking (véhicules et capacités) dans un fichier JSON."""
+        parking_data = {
+            "parking": [v.to_dict() for v in self.__parking],
+            "current_capacity": self.__current_capacity,
+        }
 
+        try:
+            with open(filename, 'w') as f:
+                json.dump(parking_data, f, indent=4)
+            print(f"État du parking sauvegardé dans {filename}.")
+        except FailToLoad :
+            print("gg nice try")
+
+    def load_state(self, filename="parking_state.json"):
+        """Charge l'état du parking depuis un fichier JSON au démarrage."""
+        
+        if not os.path.exists(filename):
+            print("Aucun fichier de sauvegarde trouvé. Démarrage à vide.")
+            return
+
+        try:
+            with open(filename, 'r') as f:
+                f.seek(0, os.SEEK_END)
+                if f.tell() == 0: 
+                    print(f"Le fichier de sauvegarde '{filename}' est vide. Démarrage à vide.")
+                    return
+                f.seek(0)
+                parking_data = json.load(f) 
+
+            self.__current_capacity = parking_data.get("current_capacity", [0, 0, 0, 0])
+            loaded_vehicles = []
+            for v_data in parking_data.get("parking", []):
+                type_vehicule = v_data.get("type_vehicule", "visiteur")  
+                if type_vehicule == "abonné":
+                    loaded_vehicles.append(Subscriber.from_dict(v_data))
+                else:
+                    loaded_vehicles.append(Vehicule.from_dict(v_data))
+                
+            self.__parking = loaded_vehicles
+        
+        except json.JSONDecodeError as e:
+            print(f"Erreur lors du décodage JSON du fichier de sauvegarde : {e}. Démarrage à vide.")
+            self.__current_capacity = [0, 0, 0, 0]
+            self.__parking = []
+        except FailToLoad :
+            self.__current_capacity = [0, 0, 0, 0]
+            self.__parking = []
+    
     def calculate_tarif(self, immatriculation):
         for v in self.parking:
             if v.immatriculation == immatriculation:

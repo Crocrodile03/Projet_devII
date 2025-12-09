@@ -42,6 +42,20 @@ class Vehicule:
     def entry_time(self):
         """Get l'heure d'entrée dans le parking."""
         return self.__entry_time
+    
+    def to_dict(self):
+        return {
+            "immatriculation": self.__immatriculation,
+            "entry_time": self.__entry_time.isoformat(), 
+            "type_vehicule": self.__type_vehicule
+        }
+
+    def from_dict(data):
+        entry_time = datetime.fromisoformat(data["entry_time"]) 
+        return Vehicule(data["immatriculation"],
+                        entry_time,
+                        data["type_vehicule"])
+
     def get_duration(self):
         """Renvoie la durée depuis entry_time en secondes (int)."""
         now = datetime.now() # L'heure actuelle
