@@ -118,9 +118,10 @@ class Application(tk.Tk):
                                    relief="sunken",
                                    bd=2)
         vehicules_frame.pack(side="left", fill="y")
+        vehicules_frame.pack_propagate(False)  # Empêche le frame de s'agrandir
 
         tk.Label(vehicules_frame,
-                 text="Véhicules dans le parking",
+                 text="Véhicules dans\nle parking",
                  font=("Arial", 14, "bold"),
                  bg=COLOR_BG,
                  fg="white").pack(pady=10)
@@ -128,7 +129,7 @@ class Application(tk.Tk):
         frame_etat.pack(fill="x", padx=10)
 
         # Canvas avec scrollbar pour la liste des véhicules
-        canvas_vehicules = tk.Canvas(vehicules_frame, bg=COLOR_BG, highlightthickness=0)
+        canvas_vehicules = tk.Canvas(vehicules_frame, bg=COLOR_BG, highlightthickness=0, width=165)
         scrollbar_vehicules = tk.Scrollbar(vehicules_frame, orient="vertical", command=canvas_vehicules.yview)
         self.vehicules_list_frame = tk.Frame(canvas_vehicules, bg=COLOR_BG)
 
@@ -137,10 +138,10 @@ class Application(tk.Tk):
             lambda e: canvas_vehicules.configure(scrollregion=canvas_vehicules.bbox("all"))
         )
 
-        canvas_vehicules.create_window((0, 0), window=self.vehicules_list_frame, anchor="nw")
+        canvas_vehicules.create_window((0, 0), window=self.vehicules_list_frame, anchor="nw", width=165)
         canvas_vehicules.configure(yscrollcommand=scrollbar_vehicules.set)
 
-        canvas_vehicules.pack(side="left", fill="both", padx=3)
+        canvas_vehicules.pack(side="left", fill="both", expand=True)
         scrollbar_vehicules.pack(side="right", fill="y")
 
         # --- FRAME PRINCIPAL ---
@@ -267,6 +268,20 @@ class Application(tk.Tk):
                            justify="left")
             label.pack(padx=10, pady=5, fill="x")
 
+            # Fonctions pour le survol
+            def on_enter(e, frame=v_frame, lbl=label):
+                frame.config(bg=COLOR_BG)
+                lbl.config(bg=COLOR_BG)
+            
+            def on_leave(e, frame=v_frame, lbl=label):
+                frame.config(bg=COLOR_ENTRY)
+                lbl.config(bg=COLOR_ENTRY)
+
+            # Bind du survol
+            label.bind("<Enter>", on_enter)
+            label.bind("<Leave>", on_leave)
+            v_frame.bind("<Enter>", on_enter)
+            v_frame.bind("<Leave>", on_leave)
             # Bind du clic sur le véhicule
             label.bind("<Button-1>", lambda e, v=vehicule: self.demander_sortie_vehicule(v))
             v_frame.bind("<Button-1>", lambda e, v=vehicule: self.demander_sortie_vehicule(v))
