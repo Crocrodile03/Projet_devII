@@ -79,37 +79,6 @@ class Application(tk.Tk):
 
         self.config(bg=COLOR_BG)
 
-        # --- ZONE VÉHICULES À GAUCHE ---
-        vehicules_frame = tk.Frame(self,
-                                   width=400,
-                                   bg=COLOR_BG,
-                                   relief="sunken",
-                                   bd=2)
-        vehicules_frame.pack(side="left", fill="both", expand=False)
-        vehicules_frame.pack_propagate(False)
-
-        tk.Label(vehicules_frame,
-                 text="Véhicules dans le parking",
-                 font=("Arial", 14, "bold"),
-                 bg=COLOR_BG,
-                 fg="white").pack(pady=10)
-
-        # Canvas avec scrollbar pour la liste des véhicules
-        canvas_vehicules = tk.Canvas(vehicules_frame, bg=COLOR_BG, highlightthickness=0)
-        scrollbar_vehicules = tk.Scrollbar(vehicules_frame, orient="vertical", command=canvas_vehicules.yview)
-        self.vehicules_list_frame = tk.Frame(canvas_vehicules, bg=COLOR_BG)
-
-        self.vehicules_list_frame.bind(
-            "<Configure>",
-            lambda e: canvas_vehicules.configure(scrollregion=canvas_vehicules.bbox("all"))
-        )
-
-        canvas_vehicules.create_window((0, 0), window=self.vehicules_list_frame, anchor="nw")
-        canvas_vehicules.configure(yscrollcommand=scrollbar_vehicules.set)
-
-        canvas_vehicules.pack(side="left", fill="both", expand=True, padx=5)
-        scrollbar_vehicules.pack(side="right", fill="y")
-
         # --- SIDEBAR DROITE ---
         sidebar = tk.Frame(self,
                            width=400,
@@ -142,6 +111,37 @@ class Application(tk.Tk):
         self.label_electriques.pack(fill="x", pady=3)
         self.label_abonnes.pack(fill="x", pady=3)
 
+        # --- ZONE VÉHICULES À GAUCHE ---
+        vehicules_frame = tk.Frame(self,
+                                   width=200,
+                                   bg=COLOR_BG,
+                                   relief="sunken",
+                                   bd=2)
+        vehicules_frame.pack(side="left", fill="y")
+
+        tk.Label(vehicules_frame,
+                 text="Véhicules dans le parking",
+                 font=("Arial", 14, "bold"),
+                 bg=COLOR_BG,
+                 fg="white").pack(pady=10)
+        frame_etat = tk.Frame(vehicules_frame, bg=COLOR_BG)
+        frame_etat.pack(fill="x", padx=10)
+
+        # Canvas avec scrollbar pour la liste des véhicules
+        canvas_vehicules = tk.Canvas(vehicules_frame, bg=COLOR_BG, highlightthickness=0)
+        scrollbar_vehicules = tk.Scrollbar(vehicules_frame, orient="vertical", command=canvas_vehicules.yview)
+        self.vehicules_list_frame = tk.Frame(canvas_vehicules, bg=COLOR_BG)
+
+        self.vehicules_list_frame.bind(
+            "<Configure>",
+            lambda e: canvas_vehicules.configure(scrollregion=canvas_vehicules.bbox("all"))
+        )
+
+        canvas_vehicules.create_window((0, 0), window=self.vehicules_list_frame, anchor="nw")
+        canvas_vehicules.configure(yscrollcommand=scrollbar_vehicules.set)
+
+        canvas_vehicules.pack(side="left", fill="both", padx=3)
+        scrollbar_vehicules.pack(side="right", fill="y")
 
         # --- FRAME PRINCIPAL ---
         main_container = tk.Frame(self,

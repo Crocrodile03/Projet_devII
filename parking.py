@@ -32,11 +32,11 @@ class Parking :
     """Classe représentant un parking"""
 
     def __init__(self):
-        # [0]: "visiteur" = 120
+        # [0]: "visiteur" = 156 (180 - 6 handicapé - 12 abonné - 4 électrique - 2 retirées)
         # [1]: "handicapé" = 6
         # [2]: "électrique" = 4
         # [3]: "abonné" = 12
-        self.__max_capacity = (120,6,4,12) # tuples des capacités par type de véhicule
+        self.__max_capacity = (156,6,4,12) # tuples des capacités par type de véhicule
         self.__current_capacity = [0,0,0,0] # liste des capacités par type de véhicule
         self.__parking = [] # liste des instances de véhicules dans le parking
         # "Lundi à Samedi : de 6h00 à 22h00 et Dimanche : de 8h00 à 20h00"
