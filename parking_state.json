@@ -44,14 +44,6 @@
             "immatriculation": "YO",
             "entry_time": "2025-12-09T13:17:44.532942",
             "type_vehicule": "visiteur"
-        },
-        {
-            "immatriculation": "GAY-LOR",
-            "entry_time": "2025-12-09T15:04:06.730034",
-            "type_vehicule": "abonn\u00e9",
-            "first_name": "Gaylor",
-            "last_name": "Lamand",
-            "phone_number": "+32479455634"
         }
     ],
     "current_capacity": [
