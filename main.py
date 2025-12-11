@@ -74,10 +74,13 @@ class Application(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Gestionnaire de Parking")
-        self.geometry("1920x1080")  # espace pour sidebar et log
+        self.state('zoomed')  # Maximise la fenêtre automatiquement
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         self.config(bg=COLOR_BG)
+        
+        # Garder trace de la liste précédente pour éviter les rafraîchissements inutiles
+        self.previous_vehicules = []
 
         # --- SIDEBAR DROITE ---
         sidebar = tk.Frame(self,
@@ -242,6 +245,16 @@ class Application(tk.Tk):
 
     def update_vehicules_list(self):
         """Met à jour la liste des véhicules affichée à gauche."""
+        # Vérifier si la liste a changé
+        current_vehicules = [v.immatriculation for v in mon_parking.parking]
+        if current_vehicules == self.previous_vehicules:
+            # Aucun changement, relancer juste la mise à jour périodique
+            self.after(1000, self.update_vehicules_list)
+            return
+        
+        # La liste a changé, mettre à jour l'affichage
+        self.previous_vehicules = current_vehicules.copy()
+        
         # Nettoyer la liste actuelle
         for widget in self.vehicules_list_frame.winfo_children():
             widget.destroy()
