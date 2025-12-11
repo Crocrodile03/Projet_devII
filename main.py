@@ -144,6 +144,12 @@ class Application(tk.Tk):
         canvas_vehicules.create_window((0, 0), window=self.vehicules_list_frame, anchor="nw", width=165)
         canvas_vehicules.configure(yscrollcommand=scrollbar_vehicules.set)
 
+        # Activer le scroll avec la molette de la souris
+        def on_mousewheel(event):
+            canvas_vehicules.yview_scroll(int(-1*(event.delta/120)), "units")
+        
+        canvas_vehicules.bind_all("<MouseWheel>", on_mousewheel)
+
         canvas_vehicules.pack(side="left", fill="both", expand=True)
         scrollbar_vehicules.pack(side="right", fill="y")
 
