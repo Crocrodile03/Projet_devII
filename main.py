@@ -74,11 +74,15 @@ class Application(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Gestionnaire de Parking")
-        self.geometry("1920x1080")  # espace pour sidebar et log
+        self.state('zoomed')  # Maximise la fenêtre automatiquement
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         self.config(bg=COLOR_BG)
+        
+        # Garder trace de la liste précédente pour éviter les rafraîchissements inutiles
+        self.previous_vehicules = []
 
+        # --- SIDEBAR DROITE ---
         sidebar = tk.Frame(self,
                            width=400,
                            bg=COLOR_BG,
@@ -110,6 +114,44 @@ class Application(tk.Tk):
         self.label_electriques.pack(fill="x", pady=3)
         self.label_abonnes.pack(fill="x", pady=3)
 
+        # --- ZONE VÉHICULES À GAUCHE ---
+        vehicules_frame = tk.Frame(self,
+                                   width=180,
+                                   bg=COLOR_BG,
+                                   relief="sunken",
+                                   bd=2)
+        vehicules_frame.pack(side="left", fill="y")
+        vehicules_frame.pack_propagate(False)  # Empêche le frame de s'agrandir
+
+        tk.Label(vehicules_frame,
+                 text="Véhicules dans\nle parking",
+                 font=("Arial", 14, "bold"),
+                 bg=COLOR_BG,
+                 fg="white").pack(pady=10)
+        frame_etat = tk.Frame(vehicules_frame, bg=COLOR_BG)
+        frame_etat.pack(fill="x", padx=10)
+
+        # Canvas avec scrollbar pour la liste des véhicules
+        canvas_vehicules = tk.Canvas(vehicules_frame, bg=COLOR_BG, highlightthickness=0, width=165)
+        scrollbar_vehicules = tk.Scrollbar(vehicules_frame, orient="vertical", command=canvas_vehicules.yview)
+        self.vehicules_list_frame = tk.Frame(canvas_vehicules, bg=COLOR_BG)
+
+        self.vehicules_list_frame.bind(
+            "<Configure>",
+            lambda e: canvas_vehicules.configure(scrollregion=canvas_vehicules.bbox("all"))
+        )
+
+        canvas_vehicules.create_window((0, 0), window=self.vehicules_list_frame, anchor="nw", width=165)
+        canvas_vehicules.configure(yscrollcommand=scrollbar_vehicules.set)
+
+        # Activer le scroll avec la molette de la souris
+        def on_mousewheel(event):
+            canvas_vehicules.yview_scroll(int(-1*(event.delta/120)), "units")
+        
+        canvas_vehicules.bind_all("<MouseWheel>", on_mousewheel)
+
+        canvas_vehicules.pack(side="left", fill="both", expand=True)
+        scrollbar_vehicules.pack(side="right", fill="y")
 
         # --- FRAME PRINCIPAL ---
         main_container = tk.Frame(self,
@@ -161,8 +203,9 @@ class Application(tk.Tk):
 
         self.show_frame(MenuPrincipal)
 
-        # Démarrer la mise à jour de la barre d'état
+        # Démarrer la mise à jour de la barre d'état et de la liste des véhicules
         self.update_sidebar()
+        self.update_vehicules_list()
 
     def show_frame(self, page):
         """
@@ -205,6 +248,80 @@ class Application(tk.Tk):
         self.label_abonnes.config(text=f"Abonnés : {a}/{tot_a}", fg=color_a)
 
         self.after(500, self.update_sidebar)
+
+    def update_vehicules_list(self):
+        """Met à jour la liste des véhicules affichée à gauche."""
+        # Vérifier si la liste a changé
+        current_vehicules = [v.immatriculation for v in mon_parking.parking]
+        if current_vehicules == self.previous_vehicules:
+            # Aucun changement, relancer juste la mise à jour périodique
+            self.after(1000, self.update_vehicules_list)
+            return
+        
+        # La liste a changé, mettre à jour l'affichage
+        self.previous_vehicules = current_vehicules.copy()
+        
+        # Nettoyer la liste actuelle
+        for widget in self.vehicules_list_frame.winfo_children():
+            widget.destroy()
+
+        # Afficher chaque véhicule
+        for vehicule in mon_parking.parking:
+            v_frame = tk.Frame(self.vehicules_list_frame, bg=COLOR_ENTRY, relief="raised", bd=1)
+            v_frame.pack(fill="x", padx=5, pady=3)
+
+            # Déterminer le type d'affichage selon si c'est un abonné ou non
+            if hasattr(vehicule, 'first_name'):
+                # C'est un Subscriber
+                info_text = f"{vehicule.immatriculation}\n{vehicule.first_name} {vehicule.last_name}\nType: {vehicule.type_vehicule}"
+            else:
+                # C'est un Vehicule normal
+                info_text = f"{vehicule.immatriculation}\nType: {vehicule.type_vehicule}"
+
+            label = tk.Label(v_frame,
+                           text=info_text,
+                           font=("Arial", 10),
+                           bg=COLOR_ENTRY,
+                           fg="white",
+                           cursor="hand2",
+                           justify="left")
+            label.pack(padx=10, pady=5, fill="x")
+
+            # Fonctions pour le survol
+            def on_enter(e, frame=v_frame, lbl=label):
+                frame.config(bg=COLOR_BG)
+                lbl.config(bg=COLOR_BG)
+
+            def on_leave(e, frame=v_frame, lbl=label):
+                frame.config(bg=COLOR_ENTRY)
+                lbl.config(bg=COLOR_ENTRY)
+
+            # Bind du survol
+            label.bind("<Enter>", on_enter)
+            label.bind("<Leave>", on_leave)
+            v_frame.bind("<Enter>", on_enter)
+            v_frame.bind("<Leave>", on_leave)
+            # Bind du clic sur le véhicule
+            label.bind("<Button-1>", lambda e, v=vehicule: self.demander_sortie_vehicule(v))
+            v_frame.bind("<Button-1>", lambda e, v=vehicule: self.demander_sortie_vehicule(v))
+
+        # Relancer la mise à jour périodique
+        self.after(1000, self.update_vehicules_list)
+
+    def demander_sortie_vehicule(self, vehicule):
+        """Demande confirmation pour faire sortir un véhicule du parking."""
+        reponse = messagebox.askyesno(
+            "Sortie de véhicule",
+            f"Voulez-vous faire sortir le véhicule {vehicule.immatriculation} du parking ?"
+        )
+        if reponse:
+            try:
+                mon_parking.vehicules_leave(vehicule.immatriculation)
+                self.log_info(f"Véhicule {vehicule.immatriculation} sorti du parking.")
+                self.update_vehicules_list()
+            except Exception as e:
+                messagebox.showerror("Erreur", str(e))
+                self.log_info(f"Erreur lors de la sortie de {vehicule.immatriculation}: {str(e)}")
 
     def log_info(self, msg):
         """
