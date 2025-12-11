@@ -269,11 +269,11 @@ class Application(tk.Tk):
             label.pack(padx=10, pady=5, fill="x")
 
             # Fonctions pour le survol
-            def on_enter(e, frame=v_frame, lbl=label):
+            def on_enter(frame=v_frame, lbl=label):
                 frame.config(bg=COLOR_BG)
                 lbl.config(bg=COLOR_BG)
-            
-            def on_leave(e, frame=v_frame, lbl=label):
+
+            def on_leave(frame=v_frame, lbl=label):
                 frame.config(bg=COLOR_ENTRY)
                 lbl.config(bg=COLOR_ENTRY)
 
