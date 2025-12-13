@@ -43,3 +43,7 @@ class InvalidValueSubscriberError(MyException):
 class FailToLoad(MyException):
     def __init__(self):
         self.message = f"Erreur lors de la sauvegarde"
+
+class IsASubscriber(MyException):
+    def __init__(self):
+        self.message = f"On ne peut pas supprimer un abonné"

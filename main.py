@@ -23,6 +23,7 @@ from tkinter import ttk, messagebox
 import datetime
 from parking import Parking
 from subscriber import Subscriber
+from exception import IsASubscriber
 
 mon_parking = Parking()
 mon_parking.load_state()
@@ -427,20 +428,37 @@ class Application(tk.Tk):
 
     def remove_selected_vehicle(self):
         """Sort le véhicule sélectionné du parking."""
-        if self.selected_immat:
-            try:
-                # Calculer le tarif avant de sortir (comme dans SortieVehicule)
-                tarif = mon_parking.calculate_tarif(self.selected_immat)
-                mon_parking.generer_paiement(self.selected_immat, mon_parking.parking, tarif)
-                mon_parking.vehicules_leave(self.selected_immat)
-                self.log_info(f"Véhicule {self.selected_immat} sorti du parking.")
-                self.selected_immat = None
-            except Exception as e:
-                self.log_info(f"Erreur lors de la sortie: {str(e)}")
-        else:
+        if not self.selected_immat:
             messagebox.showinfo("Sélection", "Veuillez sélectionner un véhicule dans la liste.")
-        self.update_vehicle_list()  # Mise à jour de la liste principale
-        self.frames[ListeVehicules].update_list()  # Mise à jour de la page ListeVehicules
+            return
+
+        vehicule = next(
+            (v for v in mon_parking.parking if v.immatriculation == self.selected_immat),
+            None
+        )
+
+        if not vehicule:
+            messagebox.showerror("Erreur", "Véhicule introuvable.")
+            return
+
+        if vehicule.type_vehicule == "abonné":
+            messagebox.showwarning(
+                "Abonné",
+                "Ce véhicule est un abonné"
+            )
+            return
+
+        try:
+            tarif = mon_parking.calculate_tarif(self.selected_immat)
+            mon_parking.generer_paiement(self.selected_immat, mon_parking.parking, tarif)
+            mon_parking.vehicules_leave(self.selected_immat)
+            self.log_info(f"Véhicule {self.selected_immat} sorti du parking.")
+            self.selected_immat = None
+        except IsASubscriber as e:
+            self.log_info(f"Erreur lors de la sortie: {str(e)}")
+
+        self.update_vehicle_list()
+        self.frames[ListeVehicules].update_list()
 
 # ============================================================
 # MENU PRINCIPAL
@@ -564,8 +582,18 @@ class EntreeVehicule(tk.Frame):
         mon_parking.vehicules_entry(immat, type_place)
         last_v = len(mon_parking.parking) - 1
         if mon_parking.parking[last_v].type_vehicule != type_place:
-            messagebox.showwarning("Place pleine",
-            f"Attention, il n'y a plus de place {type_place}, vehicule rajouté en place visiteur.")
+            choix = messagebox.askyesno(
+                "Place pleine",
+                f"Attention, il n'y a plus de place {type_place},\n"
+                "voulez-vous rajouter le véhicule en place visiteur ?"
+            )
+
+            if not choix:
+                mon_parking.vehicules_leave(mon_parking.parking[last_v].immatriculation)
+                self.controller.log_info(
+                    f"Entrée annulée pour {mon_parking.parking[last_v].immatriculation}."
+                )
+                return
         self.controller.log_info(
             f"Véhicule {immat} entré en place {mon_parking.parking[last_v].type_vehicule}.")
         self.immatriculation_entry.delete(0, tk.END)
