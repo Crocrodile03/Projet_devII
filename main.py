@@ -88,9 +88,17 @@ class Application(tk.Tk):
 
         self.config(bg=COLOR_BG)
 
+        # Calcul des tailles pour que tout s'affiche
+        left_width = 500
+        sidebar_width = 400
+        log_height = 120
+        main_width = width - left_width - sidebar_width
+        main_height = height - log_height
+
         # --- FRAME GAUCHE POUR LA LISTE DES VÉHICULES ---
         left_frame = tk.Frame(self,
-                              width=500,  # Ajuster la largeur si nécessaire
+                              width=left_width,
+                              height=main_height,
                               bg=COLOR_BG,
                               relief="sunken",
                               bd=2)
@@ -116,32 +124,37 @@ class Application(tk.Tk):
         self.filter_combo.pack(pady=5)
         self.filter_combo.bind("<<ComboboxSelected>>", self.update_vehicle_list)
 
+        # Frame pour envelopper le Treeview et assurer un fond uniforme
+        tree_frame = tk.Frame(left_frame, bg=COLOR_LABEL)
+        tree_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
         # Treeview pour la liste permanente
         columns = ("Immatriculation", "Type", "Heure d'entrée", "Prénom", "Nom", "Téléphone")
-        self.vehicle_tree = ttk.Treeview(left_frame,
+        self.vehicle_tree = ttk.Treeview(tree_frame,
                                          columns=columns,
                                          show="headings",
                                          height=20,
                                          style="Custom.Treeview")
         for col in columns:
-            self.vehicle_tree.heading(col,text=col)
-            self.vehicle_tree.column(col,width=100)  # Ajuster la largeur des colonnes
-        self.vehicle_tree.pack(fill="both", expand=True, padx=10, pady=10)
+            self.vehicle_tree.heading(col, text=col, command=lambda c=col: self.sort_vehicle_list(c))
+            self.vehicle_tree.column(col, width=100)  # Ajuster la largeur des colonnes
+        self.vehicle_tree.pack(fill="both", expand=True)  # Retirer padx/pady ici, car ils sont sur le frame
 
         # Configurer le style pour le Treeview
         style = ttk.Style()
         style.configure("Custom.Treeview", background=COLOR_LABEL, fieldbackground=COLOR_LABEL)
 
         # Configurer le tag pour la sélection persistante
-        self.vehicle_tree.tag_configure("selected",background="lightblue") # Couleur de surbrillance
+        self.vehicle_tree.tag_configure("selected", background="lightblue")  # Couleur de surbrillance
 
-        # Scrollbar pour le Treeview
-        scrollbar = ttk.Scrollbar(left_frame, orient="vertical", command=self.vehicle_tree.yview)
+        # Scrollbar pour le Treeview (dans le même frame)
+        scrollbar = ttk.Scrollbar(tree_frame, orient="vertical", command=self.vehicle_tree.yview)
         scrollbar.pack(side="right", fill="y")
         self.vehicle_tree.configure(yscrollcommand=scrollbar.set)
 
         # Variable pour stocker l'immatriculation sélectionnée
         self.selected_immat = None
+        self.sort_order = {}  # Pour gérer l'ordre de tri (asc/desc)
 
         # Binder la sélection
         self.vehicle_tree.bind("<<TreeviewSelect>>", self.on_vehicle_select)
@@ -152,7 +165,8 @@ class Application(tk.Tk):
 
         # --- FRAME PRINCIPAL ---
         main_container = tk.Frame(self,
-                                  height=120,
+                                  width=main_width,
+                                  height=main_height,
                                   bg=COLOR_BG)
         main_container.pack(side="left",  # Changé de "right" à "left" pour s'adapter
                             fill="both",
@@ -160,7 +174,8 @@ class Application(tk.Tk):
 
         # --- SIDEBAR DROITE POUR L'ÉTAT ---
         sidebar = tk.Frame(self,
-                           width=400,
+                           width=sidebar_width,
+                           height=main_height,
                            bg=COLOR_BG,
                            relief="sunken",
                            bd=2)
@@ -193,7 +208,7 @@ class Application(tk.Tk):
 
         # --- ZONE LOG EN BAS ---
         log_frame = tk.Frame(self,
-                             height=120,
+                             height=log_height,
                              bg=COLOR_BG)
         log_frame.pack(side="bottom",
                        fill="x",
@@ -332,6 +347,53 @@ class Application(tk.Tk):
                                                             "", "", ""))
 
         # Réappliquer le tag de sélection si un véhicule est sélectionné et présent dans la liste filtrée
+        if self.selected_immat:
+            for item in self.vehicle_tree.get_children():
+                if self.vehicle_tree.item(item, 'values')[0] == self.selected_immat:
+                    self.vehicle_tree.item(item, tags=("selected",))
+                    break
+
+    def sort_vehicle_list(self, col):
+        """Trie la liste des véhicules par la colonne spécifiée."""
+        selected_type = self.filter_var.get()
+        if selected_type == "Tous":
+            vehicles = mon_parking.parking[:]
+        else:
+            vehicles = mon_parking.find_vehicule_by_type(selected_type, mon_parking)[:]
+
+        # Inverser l'ordre si déjà trié
+        reverse = self.sort_order.get(col, False)
+        if col == "Immatriculation":
+            vehicles.sort(key=lambda v: v.immatriculation, reverse=reverse)
+        elif col == "Type":
+            vehicles.sort(key=lambda v: v.type_vehicule, reverse=reverse)
+        elif col == "Heure d'entrée":
+            vehicles.sort(key=lambda v: v.entry_time, reverse=reverse)
+        else:
+            return
+
+        self.sort_order[col] = not reverse
+
+        # Vider et recharger la liste triée
+        for item in self.vehicle_tree.get_children():
+            self.vehicle_tree.delete(item)
+
+        for v in vehicles:
+            entry_time_str = v.entry_time.strftime("%d/%m/%Y %H:%M")
+            if isinstance(v, Subscriber):
+                self.vehicle_tree.insert("", "end", values=(v.immatriculation,
+                                                            v.type_vehicule,
+                                                            entry_time_str,
+                                                            v.first_name,
+                                                            v.last_name,
+                                                            v.phone_number))
+            else:
+                self.vehicle_tree.insert("", "end", values=(v.immatriculation,
+                                                            v.type_vehicule,
+                                                            entry_time_str,
+                                                            "", "", ""))
+
+        # Réappliquer la sélection
         if self.selected_immat:
             for item in self.vehicle_tree.get_children():
                 if self.vehicle_tree.item(item, 'values')[0] == self.selected_immat:
@@ -676,6 +738,7 @@ class ListeVehicules(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent, bg=COLOR_BG)
         self.controller = controller
+        self.sort_order = {}  # Pour gérer l'ordre de tri (asc/desc)
 
         tk.Label(self,
                  text="Liste des Véhicules Garés",
@@ -704,7 +767,7 @@ class ListeVehicules(tk.Frame):
         columns = ("Immatriculation", "Type", "Heure d'entrée", "Prénom", "Nom", "Téléphone")
         self.tree = ttk.Treeview(self, columns=columns, show="headings", height=15)
         for col in columns:
-            self.tree.heading(col, text=col)
+            self.tree.heading(col, text=col, command=lambda c=col: self.sort_list(c))
             self.tree.column(col, width=120)
         self.tree.pack(fill="both", expand=True, padx=10, pady=10)
 
@@ -736,6 +799,50 @@ class ListeVehicules(tk.Frame):
         for v in vehicles:
             entry_time_str = v.entry_time.strftime("%d/%m/%Y %H:%M")
             # Vérifier si c'est un Subscriber pour afficher les infos supplémentaires
+            if isinstance(v, Subscriber):
+                self.tree.insert("", "end", values=(v.immatriculation,
+                                                    v.type_vehicule,
+                                                    entry_time_str,
+                                                    v.first_name,
+                                                    v.last_name,
+                                                    v.phone_number))
+            else:
+                self.tree.insert("",
+                                 "end",
+                                 values=(v.immatriculation,
+                                         v.type_vehicule,
+                                         entry_time_str,
+                                         "",
+                                         "",
+                                         ""))
+
+    def sort_list(self, col):
+        """Trie la liste des véhicules par la colonne spécifiée."""
+        selected_type = self.type_var.get()
+        if selected_type == "Tous":
+            vehicles = mon_parking.parking[:]
+        else:
+            vehicles = mon_parking.find_vehicule_by_type(selected_type, mon_parking)[:]
+
+        # Inverser l'ordre si déjà trié
+        reverse = self.sort_order.get(col, False)
+        if col == "Immatriculation":
+            vehicles.sort(key=lambda v: v.immatriculation, reverse=reverse)
+        elif col == "Type":
+            vehicles.sort(key=lambda v: v.type_vehicule, reverse=reverse)
+        elif col == "Heure d'entrée":
+            vehicles.sort(key=lambda v: v.entry_time, reverse=reverse)
+        else:
+            return
+
+        self.sort_order[col] = not reverse
+
+        # Vider et recharger la liste triée
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+
+        for v in vehicles:
+            entry_time_str = v.entry_time.strftime("%d/%m/%Y %H:%M")
             if isinstance(v, Subscriber):
                 self.tree.insert("", "end", values=(v.immatriculation,
                                                     v.type_vehicule,
