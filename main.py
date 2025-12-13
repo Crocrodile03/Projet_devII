@@ -66,7 +66,7 @@ class Application(tk.Tk):
 
         if taux >= 0.75:
             return COLOR_PP
-        elif taux >= 0.5:
+        if taux >= 0.5:
             return COLOR_PM
         else:
             return COLOR_PV
@@ -74,11 +74,91 @@ class Application(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Gestionnaire de Parking")
-        self.geometry("1920x1080")  # espace pour sidebar et log
+
+        # Géométrie dynamique : 80% de la taille de l'écran, centrée
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        width = int(screen_width * 0.8)
+        height = int(screen_height * 0.8)
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2
+        self.geometry(f"{width}x{height}+{x}+{y}")
+
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         self.config(bg=COLOR_BG)
 
+        # --- FRAME GAUCHE POUR LA LISTE DES VÉHICULES ---
+        left_frame = tk.Frame(self,
+                              width=500,  # Ajuster la largeur si nécessaire
+                              bg=COLOR_BG,
+                              relief="sunken",
+                              bd=2)
+        left_frame.pack(side="left", fill="y")
+
+        tk.Label(left_frame,
+                 text="Véhicules Garés",
+                 font=("Arial", 14, "bold"),
+                 bg=COLOR_BG,
+                 fg="white").pack(pady=10)
+
+        # Filtre par type
+        tk.Label(left_frame,
+                 text="Filtrer par type",
+                 bg=COLOR_BG,
+                 fg="white").pack()
+        self.filter_var = tk.StringVar(value="Tous")
+        types = ["Tous", "visiteur", "handicapé", "électrique", "abonné"]
+        self.filter_combo = ttk.Combobox(left_frame,
+                                         textvariable=self.filter_var,
+                                         values=types,
+                                         state="readonly")
+        self.filter_combo.pack(pady=5)
+        self.filter_combo.bind("<<ComboboxSelected>>", self.update_vehicle_list)
+
+        # Treeview pour la liste permanente
+        columns = ("Immatriculation", "Type", "Heure d'entrée", "Prénom", "Nom", "Téléphone")
+        self.vehicle_tree = ttk.Treeview(left_frame,
+                                         columns=columns,
+                                         show="headings",
+                                         height=20,
+                                         style="Custom.Treeview")
+        for col in columns:
+            self.vehicle_tree.heading(col,text=col)
+            self.vehicle_tree.column(col,width=100)  # Ajuster la largeur des colonnes
+        self.vehicle_tree.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # Configurer le style pour le Treeview
+        style = ttk.Style()
+        style.configure("Custom.Treeview", background=COLOR_LABEL, fieldbackground=COLOR_LABEL)
+
+        # Configurer le tag pour la sélection persistante
+        self.vehicle_tree.tag_configure("selected",background="lightblue") # Couleur de surbrillance
+
+        # Scrollbar pour le Treeview
+        scrollbar = ttk.Scrollbar(left_frame, orient="vertical", command=self.vehicle_tree.yview)
+        scrollbar.pack(side="right", fill="y")
+        self.vehicle_tree.configure(yscrollcommand=scrollbar.set)
+
+        # Variable pour stocker l'immatriculation sélectionnée
+        self.selected_immat = None
+
+        # Binder la sélection
+        self.vehicle_tree.bind("<<TreeviewSelect>>", self.on_vehicle_select)
+
+        # Bouton pour sortir le véhicule sélectionné
+        ttk.Button(left_frame, text="Sortir Véhicule Sélectionné",
+                   command=self.remove_selected_vehicle).pack(pady=10)
+
+        # --- FRAME PRINCIPAL ---
+        main_container = tk.Frame(self,
+                                  height=120,
+                                  bg=COLOR_BG)
+        main_container.pack(side="left",  # Changé de "right" à "left" pour s'adapter
+                            fill="both",
+                            expand=True)
+
+        # --- SIDEBAR DROITE POUR L'ÉTAT ---
         sidebar = tk.Frame(self,
                            width=400,
                            bg=COLOR_BG,
@@ -110,14 +190,6 @@ class Application(tk.Tk):
         self.label_electriques.pack(fill="x", pady=3)
         self.label_abonnes.pack(fill="x", pady=3)
 
-
-        # --- FRAME PRINCIPAL ---
-        main_container = tk.Frame(self,
-                                  height=120,
-                                  bg=COLOR_BG)
-        main_container.pack(side="right",
-                            fill="both",
-                            expand=True)
 
         # --- ZONE LOG EN BAS ---
         log_frame = tk.Frame(self,
@@ -151,7 +223,7 @@ class Application(tk.Tk):
 
         # Chargement des pages
         self.frames = {}
-        for F in (MenuPrincipal, EntreeVehicule, SortieVehicule, Abonnement):
+        for F in (MenuPrincipal, EntreeVehicule, SortieVehicule, Abonnement, ListeVehicules):
             frame = F(main_container,
                       self)
             self.frames[F] = frame
@@ -161,8 +233,9 @@ class Application(tk.Tk):
 
         self.show_frame(MenuPrincipal)
 
-        # Démarrer la mise à jour de la barre d'état
+        # Démarrer les mises à jour
         self.update_sidebar()
+        self.update_vehicle_list()
 
     def show_frame(self, page):
         """
@@ -180,7 +253,7 @@ class Application(tk.Tk):
         du parking.
 
         Cette méthode récupère les valeurs de capacité depuis `mon_parking`
-        puis met à jour l’étiquette correspondante. Elle se rappelle
+        puis met à jour l'étiquette correspondante. Elle se rappelle
         automatiquement toutes les 500 ms pour assurer une mise à jour continue.
         """
         # Récupération des capacités actuelles
@@ -228,6 +301,79 @@ class Application(tk.Tk):
         """Gère la fermeture de l'application en sauvegardant l'état du parking."""
         mon_parking.save_state()
         self.destroy()
+
+    def update_vehicle_list(self, event=None):
+        """Met à jour la liste des véhicules garés dans le panneau gauche."""
+        # Vider la liste actuelle
+        for item in self.vehicle_tree.get_children():
+            self.vehicle_tree.delete(item)
+
+        # Récupérer les véhicules filtrés
+        selected_type = self.filter_var.get()
+        if selected_type == "Tous":
+            vehicles = mon_parking.parking
+        else:
+            vehicles = mon_parking.find_vehicule_by_type(selected_type, mon_parking)
+
+        # Ajouter les véhicules au Treeview
+        for v in vehicles:
+            entry_time_str = v.entry_time.strftime("%d/%m/%Y %H:%M")
+            if isinstance(v, Subscriber):
+                self.vehicle_tree.insert("", "end", values=(v.immatriculation,
+                                                            v.type_vehicule,
+                                                            entry_time_str,
+                                                            v.first_name,
+                                                            v.last_name,
+                                                            v.phone_number))
+            else:
+                self.vehicle_tree.insert("", "end", values=(v.immatriculation,
+                                                            v.type_vehicule,
+                                                            entry_time_str,
+                                                            "", "", ""))
+
+        # Réappliquer le tag de sélection si un véhicule est sélectionné et présent dans la liste filtrée
+        if self.selected_immat:
+            for item in self.vehicle_tree.get_children():
+                if self.vehicle_tree.item(item, 'values')[0] == self.selected_immat:
+                    self.vehicle_tree.item(item, tags=("selected",))
+                    break
+
+    def on_vehicle_select(self, event):
+        """Gère la sélection d'un véhicule dans le Treeview."""
+        # Supprimer le tag de l'ancien sélectionné
+        if self.selected_immat:
+            for item in self.vehicle_tree.get_children():
+                if self.vehicle_tree.item(item, 'values')[0] == self.selected_immat:
+                    self.vehicle_tree.item(item, tags=())
+                    break
+
+        selected = self.vehicle_tree.selection()
+        if selected:
+            item = selected[0]
+            # Vérifier si c'est le même véhicule (pour désélectionner)
+            new_immat = self.vehicle_tree.item(item, 'values')[0]
+            if new_immat == self.selected_immat:
+                self.selected_immat = None
+            else:
+                self.vehicle_tree.item(item, tags=("selected",))
+                self.selected_immat = new_immat
+
+    def remove_selected_vehicle(self):
+        """Sort le véhicule sélectionné du parking."""
+        if self.selected_immat:
+            try:
+                # Calculer le tarif avant de sortir (comme dans SortieVehicule)
+                tarif = mon_parking.calculate_tarif(self.selected_immat)
+                mon_parking.generer_paiement(self.selected_immat, mon_parking.parking, tarif)
+                mon_parking.vehicules_leave(self.selected_immat)
+                self.log_info(f"Véhicule {self.selected_immat} sorti du parking.")
+                self.selected_immat = None
+            except Exception as e:
+                self.log_info(f"Erreur lors de la sortie: {str(e)}")
+        else:
+            messagebox.showinfo("Sélection", "Veuillez sélectionner un véhicule dans la liste.")
+        self.update_vehicle_list()  # Mise à jour de la liste principale
+        self.frames[ListeVehicules].update_list()  # Mise à jour de la page ListeVehicules
 
 # ============================================================
 # MENU PRINCIPAL
@@ -357,7 +503,8 @@ class EntreeVehicule(tk.Frame):
             f"Véhicule {immat} entré en place {mon_parking.parking[last_v].type_vehicule}.")
         self.immatriculation_entry.delete(0, tk.END)
         self.type_var.set("visiteur")
-
+        self.controller.update_vehicle_list()  # Mise à jour de la liste principale
+        self.controller.frames[ListeVehicules].update_list()  # Mise à jour de la page ListeVehicules
 
 # ============================================================
 # SORTIE VEHICULE
@@ -420,7 +567,8 @@ class SortieVehicule(tk.Frame):
         mon_parking.vehicules_leave(immat)
         self.controller.log_info(f"Véhicule {immat} sorti du parking.")
         self.immatriculation_entry.delete(0, tk.END)
-
+        self.controller.update_vehicle_list()  # Mise à jour de la liste principale
+        self.controller.frames[ListeVehicules].update_list()  # Mise à jour de la page ListeVehicules
 
 # ============================================================
 # ABONNEMENT
@@ -511,6 +659,99 @@ class Abonnement(tk.Frame):
         self.name_entry.delete(0, tk.END)
         self.first_name_entry.delete(0, tk.END)
         self.phone_entry.delete(0, tk.END)
+        self.controller.update_vehicle_list()  # Mise à jour de la liste principale
+        self.controller.frames[ListeVehicules].update_list()  # Mise à jour de la page ListeVehicules
+
+# ============================================================
+# LISTE VEHICULES
+# ============================================================
+
+class ListeVehicules(tk.Frame):
+    """
+    Page affichant la liste des véhicules garés dans le parking.
+    
+    Permet de filtrer par type de véhicule via un combobox.
+    Utilise un Treeview pour afficher les détails des véhicules.
+    """
+    def __init__(self, parent, controller):
+        super().__init__(parent, bg=COLOR_BG)
+        self.controller = controller
+
+        tk.Label(self,
+                 text="Liste des Véhicules Garés",
+                 font=("Arial", 18),
+                 bg=COLOR_BG,
+                 fg=COLOR_LABEL).pack(pady=10)
+
+        # Filtre par type
+        tk.Label(self,
+                 text="Filtrer par type",
+                 bg=COLOR_BG,
+                 fg="white").pack()
+        self.type_var = tk.StringVar(value="Tous")
+        types = ["Tous", "visiteur", "handicapé", "électrique", "abonné"]
+        self.type_combo = ttk.Combobox(self,
+                                       textvariable=self.type_var,
+                                       values=types,
+                                       state="readonly")
+        self.type_combo.pack(pady=5)
+        self.type_combo.bind("<<ComboboxSelected>>", self.update_list)
+
+        # Bouton Refresh
+        ttk.Button(self, text="Actualiser", command=self.update_list).pack(pady=5)
+
+        # Treeview pour la liste
+        columns = ("Immatriculation", "Type", "Heure d'entrée", "Prénom", "Nom", "Téléphone")
+        self.tree = ttk.Treeview(self, columns=columns, show="headings", height=15)
+        for col in columns:
+            self.tree.heading(col, text=col)
+            self.tree.column(col, width=120)
+        self.tree.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # Scrollbar pour le Treeview
+        scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
+        scrollbar.pack(side="right", fill="y")
+        self.tree.configure(yscrollcommand=scrollbar.set)
+
+        ttk.Button(self, text="Retour menu",
+                   command=lambda: controller.show_frame(MenuPrincipal)).pack(pady=10)
+
+        # Charger la liste initiale
+        self.update_list()
+
+    def update_list(self, event=None):
+        """Met à jour la liste des véhicules en fonction du filtre sélectionné."""
+        # Vider la liste actuelle
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+
+        # Récupérer les véhicules filtrés
+        selected_type = self.type_var.get()
+        if selected_type == "Tous":
+            vehicles = mon_parking.parking
+        else:
+            vehicles = mon_parking.find_vehicule_by_type(selected_type, mon_parking)
+
+        # Ajouter les véhicules au Treeview
+        for v in vehicles:
+            entry_time_str = v.entry_time.strftime("%d/%m/%Y %H:%M")
+            # Vérifier si c'est un Subscriber pour afficher les infos supplémentaires
+            if isinstance(v, Subscriber):
+                self.tree.insert("", "end", values=(v.immatriculation,
+                                                    v.type_vehicule,
+                                                    entry_time_str,
+                                                    v.first_name,
+                                                    v.last_name,
+                                                    v.phone_number))
+            else:
+                self.tree.insert("",
+                                 "end",
+                                 values=(v.immatriculation,
+                                         v.type_vehicule,
+                                         entry_time_str,
+                                         "",
+                                         "",
+                                         ""))
 
 
 # ============================================================
