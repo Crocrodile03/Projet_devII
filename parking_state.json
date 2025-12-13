@@ -19,12 +19,20 @@
             "immatriculation": "AuRevoir",
             "entry_time": "2025-12-09T13:17:22.545941",
             "type_vehicule": "visiteur"
+        },
+        {
+            "immatriculation": "2-ELR-627",
+            "entry_time": "2025-12-13T16:20:37.804023",
+            "type_vehicule": "abonn\u00e9",
+            "first_name": "Cyril",
+            "last_name": "Lamand",
+            "phone_number": "+32479455634"
         }
     ],
     "current_capacity": [
         2,
         1,
         1,
-        1
+        2
     ]
 }

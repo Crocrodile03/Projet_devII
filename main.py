@@ -78,8 +78,8 @@ class Application(tk.Tk):
         # Géométrie dynamique : 70% de la taille de l'écran, centrée
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
-        width = int(screen_width * 0.7)
-        height = int(screen_height * 0.7)
+        width = int(screen_width * 1)
+        height = int(screen_height * 1)
         x = (screen_width - width) // 2
         y = (screen_height - height) // 2
         self.geometry(f"{width}x{height}+{x}+{y}")
@@ -89,20 +89,48 @@ class Application(tk.Tk):
         self.config(bg=COLOR_BG)
 
         # Calcul des tailles pour que tout s'affiche
-        left_width = 500
-        sidebar_width = 400
         log_height = 120
-        main_width = width - left_width - sidebar_width
         main_height = height - log_height
+
+        # --- ZONE LOG EN BAS ---
+        log_frame = tk.Frame(self,
+                             height=log_height,
+                             bg=COLOR_BG)
+        log_frame.pack(side="bottom",
+                       fill="x",
+                       expand=False)
+
+        tk.Label(log_frame,
+                 text="Journal des actions",
+                 font=("Arial", 12, "bold"),
+                 bg=COLOR_BG,
+                 fg="white").pack(anchor="w")
+
+        self.log_text = tk.Text(log_frame,
+                                height=6,
+                                state="disabled",
+                                bg=COLOR_LABEL)
+        self.log_text.pack(side="left",
+                           fill="x",
+                           expand=True,
+                           padx=5,
+                           pady=5)
+
+        scrollbar = tk.Scrollbar(log_frame,
+                                 command=self.log_text.yview)
+        scrollbar.pack(side="right",
+                       fill="y")
+        self.log_text.config(yscrollcommand=scrollbar.set)
 
         # --- FRAME GAUCHE POUR LA LISTE DES VÉHICULES ---
         left_frame = tk.Frame(self,
-                              width=left_width,
-                              height=main_height,
                               bg=COLOR_BG,
                               relief="sunken",
                               bd=2)
         left_frame.pack(side="left", fill="y")
+
+        left_frame.pack_propagate(False)
+        left_frame.config(width=500)
 
         tk.Label(left_frame,
                  text="Véhicules Garés",
@@ -137,7 +165,14 @@ class Application(tk.Tk):
                                          style="Custom.Treeview")
         for col in columns:
             self.vehicle_tree.heading(col, text=col, command=lambda c=col: self.sort_vehicle_list(c))
-            self.vehicle_tree.column(col, width=100)  # Ajuster la largeur des colonnes
+           # self.vehicle_tree.column(col, width=100)  # Ajuster la largeur des colonnes
+            self.vehicle_tree.column("Immatriculation", width=100,anchor="center")
+            self.vehicle_tree.column("Type", width=65,anchor="center")
+            self.vehicle_tree.column("Heure d'entrée", width=100,anchor="center")
+            self.vehicle_tree.column("Prénom", width=60,anchor="center")
+            self.vehicle_tree.column("Nom", width=60,anchor="center")
+            self.vehicle_tree.column("Téléphone", width=85,anchor="center")
+
         self.vehicle_tree.pack(fill="both", expand=True)  # Retirer padx/pady ici, car ils sont sur le frame
 
         # Configurer le style pour le Treeview
@@ -165,21 +200,20 @@ class Application(tk.Tk):
 
         # --- FRAME PRINCIPAL ---
         main_container = tk.Frame(self,
-                                  width=main_width,
-                                  height=main_height,
                                   bg=COLOR_BG)
-        main_container.pack(side="left",  # Changé de "right" à "left" pour s'adapter
+        main_container.pack(side="left",
                             fill="both",
                             expand=True)
 
         # --- SIDEBAR DROITE POUR L'ÉTAT ---
         sidebar = tk.Frame(self,
-                           width=sidebar_width,
-                           height=main_height,
                            bg=COLOR_BG,
                            relief="sunken",
                            bd=2)
         sidebar.pack(side="right", fill="y")
+
+        sidebar.pack_propagate(False)
+        sidebar.config(width=450)
 
         tk.Label(sidebar,
                  text="État du parking",
@@ -206,35 +240,6 @@ class Application(tk.Tk):
         self.label_abonnes.pack(fill="x", pady=3)
 
 
-        # --- ZONE LOG EN BAS ---
-        log_frame = tk.Frame(self,
-                             height=log_height,
-                             bg=COLOR_BG)
-        log_frame.pack(side="bottom",
-                       fill="x",
-                       expand=False)
-
-        tk.Label(log_frame,
-                 text="Journal des actions",
-                 font=("Arial", 12, "bold"),
-                 bg=COLOR_BG,
-                 fg="white").pack(anchor="w")
-
-        self.log_text = tk.Text(log_frame,
-                                height=6,
-                                state="disabled",
-                                bg=COLOR_LABEL)
-        self.log_text.pack(side="left",
-                           fill="x",
-                           expand=True,
-                           padx=5,
-                           pady=5)
-
-        scrollbar = tk.Scrollbar(log_frame,
-                                 command=self.log_text.yview)
-        scrollbar.pack(side="right",
-                       fill="y")
-        self.log_text.config(yscrollcommand=scrollbar.set)
 
         # Chargement des pages
         self.frames = {}
