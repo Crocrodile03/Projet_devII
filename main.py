@@ -75,11 +75,11 @@ class Application(tk.Tk):
         super().__init__()
         self.title("Gestionnaire de Parking")
 
-        # Géométrie dynamique : 80% de la taille de l'écran, centrée
+        # Géométrie dynamique : 70% de la taille de l'écran, centrée
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
-        width = int(screen_width * 0.8)
-        height = int(screen_height * 0.8)
+        width = int(screen_width * 0.7)
+        height = int(screen_height * 0.7)
         x = (screen_width - width) // 2
         y = (screen_height - height) // 2
         self.geometry(f"{width}x{height}+{x}+{y}")
