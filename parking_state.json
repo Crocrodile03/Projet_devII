@@ -21,23 +21,36 @@
             "type_vehicule": "\u00e9lectrique"
         },
         {
-            "immatriculation": "azrazre",
-            "entry_time": "2025-12-13T16:36:56.423300",
-            "type_vehicule": "\u00e9lectrique"
-        },
-        {
             "immatriculation": "aaa",
-            "entry_time": "2025-12-13T17:10:55.240210",
+            "entry_time": "2025-12-14T13:30:37.651432",
             "type_vehicule": "abonn\u00e9",
             "first_name": "aa",
             "last_name": "aaaa",
             "phone_number": "aa"
+        },
+        {
+            "immatriculation": "test-123",
+            "entry_time": "2025-12-14T13:30:37.651438",
+            "type_vehicule": "abonn\u00e9",
+            "first_name": "test",
+            "last_name": "test",
+            "phone_number": "12334567897"
+        },
+        {
+            "immatriculation": "321",
+            "entry_time": "2025-12-14T13:26:53.769800",
+            "type_vehicule": "\u00e9lectrique"
+        },
+        {
+            "immatriculation": "456",
+            "entry_time": "2025-12-14T13:26:59.880765",
+            "type_vehicule": "visiteur"
         }
     ],
     "current_capacity": [
-        0,
+        1,
         1,
         4,
-        3
+        2
     ]
 }

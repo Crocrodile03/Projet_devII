@@ -593,6 +593,7 @@ class EntreeVehicule(tk.Frame):
                 self.controller.log_info(
                     f"Entrée annulée pour {mon_parking.parking[last_v].immatriculation}."
                 )
+            # à changer    
                 return
         self.controller.log_info(
             f"Véhicule {immat} entré en place {mon_parking.parking[last_v].type_vehicule}.")
