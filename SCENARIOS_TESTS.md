@@ -1,7 +1,7 @@
 # Scénarios de Tests - Système de Gestion de Parking
 
 ## 📋 Vue d'ensemble
-Ce document présente tous les scénarios de tests unitaires du système de gestion de parking, organisés par fonctionnalité pour faciliter la compréhension et la validation.
+Ce document présente tous les scénarios de tests unitaires du système de gestion de parking, organisés par fonctionnalité pour faciliter la compréhension
 
 ---
 
@@ -134,16 +134,12 @@ Ce document présente tous les scénarios de tests unitaires du système de gest
 
 ### Comment exécuter les tests
 ```bash
-# Tous les tests
-python -m unittest discover
 
 # Tests par classe
 python -m unittest test_vehicule
 python -m unittest test_subscriber  
 python -m unittest test_parking
 
-# Test spécifique
-python -m unittest test_parking.TestParking.test_vehicules_entry
 ```
 
 ### Outils utilisés
