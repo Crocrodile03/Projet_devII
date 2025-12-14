@@ -4,7 +4,7 @@ from subscriber import Subscriber
 from parking import Parking
 from unittest.mock import MagicMock
 from exception import (InvalidValueSubscriberError, FullSubscriberCapacityError, 
-                       SubscriberConflictError, CapacityError)
+                       SubscriberConflictError, CapacityError, InvalidImmatriculationError)
 
 class TestSubscriber(unittest.TestCase):
     """
@@ -167,10 +167,14 @@ class TestSubscriber(unittest.TestCase):
     # ========== TESTS VALIDATION IMMATRICULATION ABONNÉ ==========
 
     def test_subscriber_immatriculation_vide(self):
-        """Test création abonné avec immatriculation vide."""
-        s = Subscriber("", "Test", "User", "0123456789")
-        self.assertEqual(s.immatriculation, "")
-        self.assertEqual(s.type_vehicule, "abonné")
+        """Test création abonné avec immatriculation vide - doit lever une exception."""
+        with self.assertRaises(InvalidImmatriculationError):
+            s = Subscriber("", "Test", "User", "0123456789")
+
+    def test_subscriber_immatriculation_espaces_uniquement(self):
+        """Test création abonné avec immatriculation composée uniquement d'espaces - doit lever une exception."""
+        with self.assertRaises(InvalidImmatriculationError):
+            s = Subscriber("   ", "Test", "User", "0123456789")
 
     def test_subscriber_immatriculation_chiffres_uniquement(self):
         """Test création abonné avec immatriculation en chiffres uniquement."""

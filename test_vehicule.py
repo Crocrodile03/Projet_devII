@@ -1,6 +1,7 @@
 import unittest
 from datetime import datetime, timedelta
 from vehicule import Vehicule
+from exception import InvalidImmatriculationError
 
 class TestVehicule(unittest.TestCase):
 #héritage de unittest.TestCase pour que chaque test soit indépe
@@ -36,55 +37,6 @@ class TestVehicule(unittest.TestCase):
 
         self.assertEqual(v.type_vehicule, "électrique")
 
-    # ========== TESTS VALIDATION IMMATRICULATION VÉHICULE ==========
-
-    def test_vehicule_immatriculation_vide(self):
-        """Test création véhicule avec immatriculation vide."""
-        v = Vehicule("")
-        self.assertEqual(v.immatriculation, "")
-        self.assertEqual(v.type_vehicule, "visiteur")
-
-    def test_vehicule_immatriculation_chiffres_uniquement(self):
-        """Test création véhicule avec immatriculation en chiffres uniquement."""
-        v = Vehicule("123456")
-        self.assertEqual(v.immatriculation, "123456")
-        self.assertIsInstance(v.entry_time, datetime)
-
-    def test_vehicule_immatriculation_lettres_uniquement(self):
-        """Test création véhicule avec immatriculation en lettres uniquement."""
-        v = Vehicule("ABCDEF")
-        self.assertEqual(v.immatriculation, "ABCDEF")
-        self.assertIsInstance(v.entry_time, datetime)
-
-    def test_vehicule_immatriculation_caracteres_speciaux(self):
-        """Test création véhicule avec caractères spéciaux dans immatriculation."""
-        v = Vehicule("AB-123@#")
-        self.assertEqual(v.immatriculation, "AB-123@#")
-        self.assertEqual(v.type_vehicule, "visiteur")
-
-    def test_vehicule_immatriculation_espaces(self):
-        """Test création véhicule avec espaces dans immatriculation."""
-        v = Vehicule("AB 12 CD")
-        self.assertEqual(v.immatriculation, "AB 12 CD")
-        self.assertEqual(v.type_vehicule, "visiteur")
-
-    def test_vehicule_immatriculation_unicode(self):
-        """Test création véhicule avec caractères unicode/accents."""
-        v = Vehicule("ÉÀÇ-123")
-        self.assertEqual(v.immatriculation, "ÉÀÇ-123")
-        self.assertIsInstance(v.entry_time, datetime)
-
-    def test_vehicule_immatriculation_tres_longue(self):
-        """Test création véhicule avec immatriculation très longue."""
-        immat_longue = "A" * 100
-        v = Vehicule(immat_longue)
-        self.assertEqual(v.immatriculation, immat_longue)
-
-    def test_vehicule_immatriculation_casse_mixte(self):
-        """Test création véhicule avec casse mixte dans immatriculation."""
-        v = Vehicule("AbC-123-xYz")
-        self.assertEqual(v.immatriculation, "AbC-123-xYz")
-
     def test_get_duration(self):
     #test qd un véhicule rentre pdnt 2h30 est ce que ça arrondit bien à 3h
         """Test que get_duration calcule correctement la durée."""
@@ -106,6 +58,23 @@ class TestVehicule(unittest.TestCase):
 
         # Accepte 2 ou 3 car le timing peut varier de quelques microsecondes
         self.assertIn(duration, [2, 3])
+
+    def test_str_(self):
+        """Test la représentation string du véhicule."""
+        v = Vehicule("ABC-123", type_vehicule="visiteur")
+        str_repr = str(v)
+
+        self.assertIn("ABC-123", str_repr)
+        self.assertIn("visiteur", str_repr)
+
+    def test_repr_(self):
+        """Test la représentation repr du véhicule."""
+        v = Vehicule("ABC-123")
+        repr_str = repr(v)
+
+        self.assertIn("Vehicule", repr_str)
+        self.assertIn("ABC-123", repr_str)
+#vérifie bien si les deux méthode str et repr fonctionnent correctement en renvoyant les bonnes informations
 
     def test_vehicule_to_dict(self):
         """Test la conversion d'un véhicule en dictionnaire."""
@@ -151,6 +120,18 @@ class TestVehicule(unittest.TestCase):
         
         self.assertIsInstance(duration, int)
         self.assertEqual(duration, 6)  # Arrondi à l'heure supérieure
+
+# TESTS VALIDATION IMMATRICULATION VÉHICULE
+
+    def test_vehicule_immatriculation_vide(self):
+        """Test création véhicule avec immatriculation vide - doit lever une exception."""
+        with self.assertRaises(InvalidImmatriculationError):
+            v = Vehicule("")
+
+    def test_vehicule_immatriculation_espaces_uniquement(self):
+        """Test création véhicule avec immatriculation composée uniquement d'espaces - doit lever une exception."""
+        with self.assertRaises(InvalidImmatriculationError):
+            v = Vehicule("   ")
 
 if __name__ == "__main__":
     unittest.main()

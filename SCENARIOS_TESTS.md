@@ -17,7 +17,8 @@ Ce document présente tous les scénarios de tests unitaires du système de gest
 ### Scénario 1.2 : Validation d'immatriculation véhicule
 | **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |
 |------------------|---------------------|---------------------|-------------------|
-| Immatriculation vide | immat="" | Véhicule créé avec immat vide | `test_vehicule_immatriculation_vide` |
+| Immatriculation vide | immat="" | Exception InvalidImmatriculationError | `test_vehicule_immatriculation_vide` |
+| Immatriculation espaces uniquement | immat="   " | Exception InvalidImmatriculationError | `test_vehicule_immatriculation_espaces_uniquement` |
 | Chiffres uniquement | immat="123456" | Véhicule créé correctement | `test_vehicule_immatriculation_chiffres_uniquement` |
 | Lettres uniquement | immat="ABCDEF" | Véhicule créé correctement | `test_vehicule_immatriculation_lettres_uniquement` |
 | Caractères spéciaux | immat="AB-123@#" | Véhicule créé correctement | `test_vehicule_immatriculation_caracteres_speciaux` |
@@ -55,7 +56,8 @@ Ce document présente tous les scénarios de tests unitaires du système de gest
 ### Scénario 2.2 : Validation d'immatriculation abonné
 | **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |
 |------------------|---------------------|---------------------|-------------------|
-| Immatriculation vide | immat="" | Abonné créé avec immat vide | `test_subscriber_immatriculation_vide` |
+| Immatriculation vide | immat="" | Exception InvalidImmatriculationError | `test_subscriber_immatriculation_vide` |
+| Immatriculation espaces uniquement | immat="   " | Exception InvalidImmatriculationError | `test_subscriber_immatriculation_espaces_uniquement` |
 | Chiffres uniquement | immat="123456789" | Abonné créé correctement | `test_subscriber_immatriculation_chiffres_uniquement` |
 | Lettres uniquement | immat="ABCDEFGH" | Abonné créé correctement | `test_subscriber_immatriculation_lettres_uniquement` |
 | Caractères spéciaux | immat="AB-123@#$" | Abonné créé correctement | `test_subscriber_immatriculation_caracteres_speciaux` |
@@ -144,7 +146,8 @@ Ce document présente tous les scénarios de tests unitaires du système de gest
 ### Scénario 3.6 : Entrée de véhicules - validation immatriculation
 | **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |
 |------------------|---------------------|---------------------|-------------------|
-| Immatriculation vide | immat="" | Véhicule ajouté au parking | `test_vehicules_entry_immatriculation_vide` |
+| Immatriculation vide | immat="" | Exception InvalidImmatriculationError | `test_vehicules_entry_immatriculation_vide` |
+| Immatriculation espaces uniquement | immat="   " | Exception InvalidImmatriculationError | `test_vehicules_entry_immatriculation_espaces_uniquement` |
 | Chiffres uniquement | immat="123456" | Véhicule ajouté, capacity +1 | `test_vehicules_entry_immatriculation_chiffres_uniquement` |
 | Lettres uniquement | immat="ABCDEF" | Véhicule ajouté, capacity +1 | `test_vehicules_entry_immatriculation_lettres_uniquement` |
 | Caractères spéciaux | immat="AB-123@!" | Véhicule ajouté, capacity +1 | `test_vehicules_entry_immatriculation_caracteres_speciaux` |

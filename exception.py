@@ -47,3 +47,7 @@ class FailToLoad(MyException):
 class IsASubscriber(MyException):
     def __init__(self):
         self.message = f"On ne peut pas supprimer un abonné"
+
+class InvalidImmatriculationError(MyException):
+    def __init__(self):
+        self.message = "L'immatriculation ne peut pas être vide ou composée uniquement d'espaces."

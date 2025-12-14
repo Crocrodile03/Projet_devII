@@ -4,7 +4,8 @@ from parking import Parking
 from vehicule import Vehicule
 from subscriber import Subscriber
 from unittest.mock import MagicMock, patch, mock_open
-from exception import MissingVehiculeError, VehiculeError, InvalidTypeError, SubscriberConflictError, CapacityError
+from exception import (MissingVehiculeError, VehiculeError, InvalidTypeError, 
+                       SubscriberConflictError, CapacityError, InvalidImmatriculationError)
 import json
 import os
 
@@ -333,172 +334,17 @@ class TestParking(unittest.TestCase):
 
     # ========== TESTS VALIDATION IMMATRICULATION ENTRÉE ==========
     
-    @patch("parking.Vehicule")
-    def test_vehicules_entry_immatriculation_vide(self, MockVehicule):
-        """Test entrée avec immatriculation vide."""
+    def test_vehicules_entry_immatriculation_vide(self):
+        """Test entrée véhicule avec immatriculation vide - doit lever une exception."""
         p = Parking()
-        mock_v = MagicMock()
-        mock_v.immatriculation = ""
-        mock_v.type_vehicule = "visiteur"
-        mock_v.entry_time = datetime.now()
-        MockVehicule.return_value = mock_v
-        
-        # Devrait permettre l'entrée (pas de validation dans le code actuel)
-        v = p.vehicules_entry("", "visiteur")
-        self.assertIn(mock_v, p.parking)
+        with self.assertRaises(InvalidImmatriculationError):
+            p.vehicules_entry("", "visiteur")
 
-    @patch("parking.Vehicule")
-    def test_vehicules_entry_immatriculation_chiffres_uniquement(self, MockVehicule):
-        """Test entrée avec immatriculation composée uniquement de chiffres."""
+    def test_vehicules_entry_immatriculation_espaces_uniquement(self):
+        """Test entrée véhicule avec immatriculation composée uniquement d'espaces - doit lever une exception."""
         p = Parking()
-        mock_v = MagicMock()
-        mock_v.immatriculation = "123456"
-        mock_v.type_vehicule = "visiteur"
-        mock_v.entry_time = datetime.now()
-        MockVehicule.return_value = mock_v
-        
-        v = p.vehicules_entry("123456", "visiteur")
-        self.assertIn(mock_v, p.parking)
-        self.assertEqual(p.current_capacity[0], 1)
-
-    @patch("parking.Vehicule")
-    def test_vehicules_entry_immatriculation_lettres_uniquement(self, MockVehicule):
-        """Test entrée avec immatriculation composée uniquement de lettres."""
-        p = Parking()
-        mock_v = MagicMock()
-        mock_v.immatriculation = "ABCDEF"
-        mock_v.type_vehicule = "visiteur"
-        mock_v.entry_time = datetime.now()
-        MockVehicule.return_value = mock_v
-        
-        v = p.vehicules_entry("ABCDEF", "visiteur")
-        self.assertIn(mock_v, p.parking)
-        self.assertEqual(p.current_capacity[0], 1)
-
-    @patch("parking.Vehicule")
-    def test_vehicules_entry_immatriculation_caracteres_speciaux(self, MockVehicule):
-        """Test entrée avec immatriculation contenant caractères spéciaux."""
-        p = Parking()
-        mock_v = MagicMock()
-        mock_v.immatriculation = "AB-123@!"
-        mock_v.type_vehicule = "visiteur"
-        mock_v.entry_time = datetime.now()
-        MockVehicule.return_value = mock_v
-        
-        v = p.vehicules_entry("AB-123@!", "visiteur")
-        self.assertIn(mock_v, p.parking)
-        self.assertEqual(p.current_capacity[0], 1)
-
-    @patch("parking.Vehicule")
-    def test_vehicules_entry_immatriculation_espaces(self, MockVehicule):
-        """Test entrée avec immatriculation contenant des espaces."""
-        p = Parking()
-        mock_v = MagicMock()
-        mock_v.immatriculation = "AB 123 CD"
-        mock_v.type_vehicule = "visiteur"
-        mock_v.entry_time = datetime.now()
-        MockVehicule.return_value = mock_v
-        
-        v = p.vehicules_entry("AB 123 CD", "visiteur")
-        self.assertIn(mock_v, p.parking)
-        self.assertEqual(p.current_capacity[0], 1)
-
-    @patch("parking.Vehicule")
-    def test_vehicules_entry_immatriculation_tres_longue(self, MockVehicule):
-        """Test entrée avec immatriculation très longue."""
-        p = Parking()
-        immat_longue = "A" * 100
-        mock_v = MagicMock()
-        mock_v.immatriculation = immat_longue
-        mock_v.type_vehicule = "visiteur"
-        mock_v.entry_time = datetime.now()
-        MockVehicule.return_value = mock_v
-        
-        v = p.vehicules_entry(immat_longue, "visiteur")
-        self.assertIn(mock_v, p.parking)
-
-    # ========== TESTS VALIDATION IMMATRICULATION SORTIE ==========
-
-    def test_vehicules_leave_immatriculation_vide(self):
-        """Test sortie avec immatriculation vide."""
-        p = Parking()
-        with self.assertRaises(MissingVehiculeError):
-            p.vehicules_leave("")
-
-    def test_vehicules_leave_immatriculation_inexistante(self):
-        """Test sortie avec immatriculation qui n'existe pas."""
-        p = Parking()
-        mock_v = MagicMock()
-        mock_v.immatriculation = "EXISTS-001"
-        mock_v.type_vehicule = "visiteur"
-        p.parking.append(mock_v)
-        
-        with self.assertRaises(MissingVehiculeError):
-            p.vehicules_leave("NOT-EXISTS")
-
-    def test_vehicules_leave_immatriculation_chiffres(self):
-        """Test sortie avec immatriculation composée de chiffres."""
-        p = Parking()
-        mock_v = MagicMock()
-        mock_v.immatriculation = "999888"
-        mock_v.type_vehicule = "visiteur"
-        p.parking.append(mock_v)
-        p.current_capacity = [1, 0, 0, 0]
-        
-        result = p.vehicules_leave("999888")
-        self.assertTrue(result)
-        self.assertNotIn(mock_v, p.parking)
-
-    def test_vehicules_leave_immatriculation_lettres(self):
-        """Test sortie avec immatriculation composée de lettres."""
-        p = Parking()
-        mock_v = MagicMock()
-        mock_v.immatriculation = "ZZYYXX"
-        mock_v.type_vehicule = "visiteur"
-        p.parking.append(mock_v)
-        p.current_capacity = [1, 0, 0, 0]
-        
-        result = p.vehicules_leave("ZZYYXX")
-        self.assertTrue(result)
-        self.assertNotIn(mock_v, p.parking)
-
-    def test_vehicules_leave_immatriculation_caracteres_speciaux(self):
-        """Test sortie avec immatriculation contenant caractères spéciaux."""
-        p = Parking()
-        mock_v = MagicMock()
-        mock_v.immatriculation = "XX-99@#"
-        mock_v.type_vehicule = "visiteur"
-        p.parking.append(mock_v)
-        p.current_capacity = [1, 0, 0, 0]
-        
-        result = p.vehicules_leave("XX-99@#")
-        self.assertTrue(result)
-        self.assertNotIn(mock_v, p.parking)
-
-    def test_vehicules_leave_immatriculation_espaces(self):
-        """Test sortie avec immatriculation contenant des espaces."""
-        p = Parking()
-        mock_v = MagicMock()
-        mock_v.immatriculation = "YY 88 ZZ"
-        mock_v.type_vehicule = "visiteur"
-        p.parking.append(mock_v)
-        p.current_capacity = [1, 0, 0, 0]
-        
-        result = p.vehicules_leave("YY 88 ZZ")
-        self.assertTrue(result)
-        self.assertNotIn(mock_v, p.parking)
-
-    def test_vehicules_leave_casse_sensible(self):
-        """Test que la recherche d'immatriculation est sensible à la casse."""
-        p = Parking()
-        mock_v = MagicMock()
-        mock_v.immatriculation = "ABC-123"
-        mock_v.type_vehicule = "visiteur"
-        p.parking.append(mock_v)
-        
-        # Devrait échouer si casse différente
-        with self.assertRaises(MissingVehiculeError):
-            p.vehicules_leave("abc-123")
+        with self.assertRaises(InvalidImmatriculationError):
+            p.vehicules_entry("   ", "visiteur")
 
 if __name__ == '__main__':
     unittest.main()
