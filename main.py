@@ -3,6 +3,8 @@ Module regroupant les importations nécessaires à la création de l'interface
 graphique de l'application, ainsi qu'à la gestion du parking et des abonnés.
 
 Imports :
+    - os : fournit des fonctionnalités liées au système d'exploitation,
+      notamment la manipulation de chemins et de fichiers.
     - tkinter as tk : bibliothèque standard pour construire l'interface
       graphique (widgets, fenêtres, événements).
     - tkinter.ttk : widgets thématiques améliorés (labels, boutons, cadres, etc.).
@@ -18,6 +20,7 @@ Ce module sert de base à la partie interface utilisateur de l'application,
 permettant d'interagir avec le système de gestion du parking.
 """
 
+import os
 import tkinter as tk
 from tkinter import ttk, messagebox
 import datetime
@@ -88,7 +91,6 @@ class Application(tk.Tk):
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         self.config(bg=COLOR_BG)
-
         # Calcul des tailles pour que tout s'affiche
         log_height = 120
         main_height = height - log_height
@@ -426,6 +428,14 @@ class Application(tk.Tk):
                 self.vehicle_tree.item(item, tags=("selected",))
                 self.selected_immat = new_immat
 
+    def ouvrir_pdf(self, file_path):
+        """Ouvre un fichier PDF avec le lecteur par défaut."""
+
+        if os.name == "nt":  # Windows
+            os.startfile(file_path)
+        elif os.name == "posix":  # Linux / macOS
+            os.system(f'xdg-open "{file_path}"')
+
     def remove_selected_vehicle(self):
         """Sort le véhicule sélectionné du parking."""
         if not self.selected_immat:
@@ -441,20 +451,20 @@ class Application(tk.Tk):
             messagebox.showerror("Erreur", "Véhicule introuvable.")
             return
 
-        if vehicule.type_vehicule == "abonné":
-            messagebox.showwarning(
-                "Abonné",
-                "Ce véhicule est un abonné"
-            )
+        if mon_parking.find_vehicule(self.selected_immat, mon_parking).type_vehicule == 'abonné':
+            self.log_info("Erreur lors de la sortie: On ne peut pas supprimer un abonné")
+            messagebox.showinfo("Retirer", "Vous ne pouvez pas retirer un abonné")
             return
 
         try:
             tarif = mon_parking.calculate_tarif(self.selected_immat)
-            mon_parking.generer_paiement(self.selected_immat, mon_parking.parking, tarif)
+            pdf_path = mon_parking.generer_paiement(self.selected_immat, mon_parking.parking, tarif)
+            self.ouvrir_pdf(pdf_path)
             mon_parking.vehicules_leave(self.selected_immat)
             self.log_info(f"Véhicule {self.selected_immat} sorti du parking.")
             self.selected_immat = None
         except IsASubscriber as e:
+            messagebox.showinfo("Retirer", "Vous ne pouvez pas retirer un abonné")
             self.log_info(f"Erreur lors de la sortie: {str(e)}")
 
         self.update_vehicle_list()
@@ -595,6 +605,7 @@ class EntreeVehicule(tk.Frame):
                 )
             # à changer    
                 return
+
         self.controller.log_info(
             f"Véhicule {immat} entré en place {mon_parking.parking[last_v].type_vehicule}.")
         self.immatriculation_entry.delete(0, tk.END)
@@ -643,6 +654,14 @@ class SortieVehicule(tk.Frame):
                    text="Retour menu",
                    command=lambda: controller.show_frame(MenuPrincipal)).pack()
 
+    def ouvrir_pdf(self, file_path):
+        """Ouvre un fichier PDF avec le lecteur par défaut."""
+
+        if os.name == "nt":  # Windows
+            os.startfile(file_path)
+        elif os.name == "posix":  # Linux / macOS
+            os.system(f'xdg-open "{file_path}"')
+
     def valider(self):
         """
         Valide l'entrée du véhicule dans le parking.
@@ -658,8 +677,14 @@ class SortieVehicule(tk.Frame):
         if not immat:
             self.controller.log_info("Erreur : immatriculation vide.")
             return
+        if mon_parking.find_vehicule(immat, mon_parking).type_vehicule == 'abonné':
+            self.controller.log_info("Erreur lors de la sortie: On ne peut pas supprimer un abonné")
+            messagebox.showinfo("Retirer", "Vous ne pouvez pas retirer un abonné")
+            return
+
         a = mon_parking.calculate_tarif(immat)
-        mon_parking.generer_paiement(immat,mon_parking.parking, a)
+        pdf_path = mon_parking.generer_paiement(immat, mon_parking.parking, a)
+        self.ouvrir_pdf(pdf_path)
         mon_parking.vehicules_leave(immat)
         self.controller.log_info(f"Véhicule {immat} sorti du parking.")
         self.immatriculation_entry.delete(0, tk.END)

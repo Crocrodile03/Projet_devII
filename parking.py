@@ -25,7 +25,7 @@ from reportlab.lib.pagesizes import mm
 from vehicule import Vehicule
 from subscriber import Subscriber
 from exception import (CapacityError, MissingVehiculeError, InvalidTypeError,
-                       VehiculeError, SubscriberConflictError, FailToLoad)
+                       VehiculeError, SubscriberConflictError, FailToLoad, IsASubscriber)
 
 
 class Parking :
@@ -154,6 +154,11 @@ class Parking :
         print(f"Véhicules de type '{type_v}' dans le parking : {type_of_vehicule}")
         return type_of_vehicule
 
+    def find_vehicule(self, immat: str, p: list):
+        for v in p.parking:
+            if v.immatriculation == immat:
+                return v
+
     def vehicules_entry(self, immatriculation: str, type_vehicule:  str):
         """
         Paramètre : immatriculation; Type: str; 
@@ -224,6 +229,8 @@ class Parking :
         """
         for v in self.parking:
             if v.immatriculation == immatriculation :
+                if v.type_vehicule == 'abonné':
+                    raise IsASubscriber
                 self.parking.remove(v)
                 if v.type_vehicule == 'visiteur':
                     self.current_capacity[0] -= 1
@@ -329,6 +336,9 @@ class Parking :
             if v.immatriculation == immatriculation:
                 time_in_parking = v.get_duration()
                 type_v = v.type_vehicule
+                break
+        if type_v == "abonné":
+            return False
         directory = "paiements"
         file = f"paiement_{immatriculation}_{mois_fr[datetime.datetime.now().month - 1]}.pdf"
         if not os.path.exists(directory):
