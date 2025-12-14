@@ -161,5 +161,3 @@ python -m unittest test_parking.TestParking.test_vehicules_entry
 - **Méthode de test** : Nom de la méthode de test unitaire correspondante
 
 ---
-
-*Document généré pour la présentation des scénarios de test du projet de gestion de parking*
