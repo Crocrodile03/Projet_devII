@@ -305,5 +305,3 @@ python -m unittest test_parking.TestParking.test_vehicules_entry_immatriculation
 - **Méthode de test** : Nom de la méthode de test unitaire correspondante
 
 ---
-
-*Document mis à jour avec 99 tests unitaires couvrant 26 scénarios*
