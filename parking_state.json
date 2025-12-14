@@ -22,7 +22,7 @@
         },
         {
             "immatriculation": "aaa",
-            "entry_time": "2025-12-14T21:13:32.886061",
+            "entry_time": "2025-12-14T21:46:15.519299",
             "type_vehicule": "abonn\u00e9",
             "first_name": "aa",
             "last_name": "aaaa",
@@ -42,10 +42,15 @@
             "immatriculation": "aa",
             "entry_time": "2025-12-14T21:13:36.889788",
             "type_vehicule": "visiteur"
+        },
+        {
+            "immatriculation": "test",
+            "entry_time": "2025-12-14T21:32:22.780951",
+            "type_vehicule": "visiteur"
         }
     ],
     "current_capacity": [
-        2,
+        3,
         1,
         4,
         2
