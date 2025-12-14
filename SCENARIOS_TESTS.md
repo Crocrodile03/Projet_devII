@@ -1,6 +1,6 @@
 # Scénarios de Tests - Système de Gestion de Parking
 
-## 📋 Vue d'ensemble
+## Vue d'ensemble
 Ce document présente tous les scénarios de tests unitaires du système de gestion de parking, organisés par fonctionnalité pour faciliter la compréhension et la validation.
 
 ---
@@ -236,19 +236,7 @@ Ce document présente tous les scénarios de tests unitaires du système de gest
 
 ---
 
-## 📊 Résumé des Tests par Catégorie
-
-| **Classe** | **Nombre de scénarios** | **Nombre de tests** | **Couverture** |
-|------------|-------------------------|---------------------|----------------|
-| Vehicule | 4 scénarios | 18 tests | Initialisation, validation, durée, sérialisation |
-| Subscriber | 6 scénarios | 26 tests | Création, validation, abonnement, sérialisation |
-| Parking | 12 scénarios | 41 tests | Gestion complète avec validation immatriculation |
-| Exception | 4 scénarios | 14 tests | Toutes les exceptions personnalisées |
-| **TOTAL** | **26 scénarios** | **99 tests** | **Couverture 92%** |
-
----
-
-## 🎯 Types d'exceptions testées
+## Types d'exceptions testées
 
 | **Exception** | **Situation** | **Tests concernés** |
 |--------------|---------------|-------------------|
@@ -265,7 +253,7 @@ Ce document présente tous les scénarios de tests unitaires du système de gest
 
 ---
 
-## 📝 Notes d'exécution
+## Notes d'exécution
 
 ### Comment exécuter les tests
 ```bash
@@ -287,21 +275,5 @@ python -m unittest test_parking.TestParking.test_vehicules_entry_immatriculation
 - Couverture : `pytest-cov`
 - Mocking : `unittest.mock.MagicMock`, `patch`, `mock_open`
 - Assertions : `assertEqual`, `assertTrue`, `assertRaises`, `assertIn`, etc.
-
-### Résultats de couverture
-- **exception.py** : 100% ✅
-- **subscriber.py** : 100% ✅
-- **vehicule.py** : 90% ✅
-- **parking.py** : 88% ✅
-- **TOTAL** : 92% ✅ (objectif 85% dépassé)
-
----
-
-## ✅ Légende des colonnes
-
-- **Aspect testé** : Fonctionnalité ou comportement vérifié
-- **Données d'entrée** : Paramètres et conditions initiales du test
-- **Résultat attendu** : Comportement ou valeur espérée après exécution
-- **Méthode de test** : Nom de la méthode de test unitaire correspondante
 
 ---
