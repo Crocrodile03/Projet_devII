@@ -22,7 +22,7 @@
         },
         {
             "immatriculation": "aaa",
-            "entry_time": "2025-12-14T21:13:32.886061",
+            "entry_time": "2025-12-15T11:36:04.465901",
             "type_vehicule": "abonn\u00e9",
             "first_name": "aa",
             "last_name": "aaaa",
@@ -32,20 +32,10 @@
             "immatriculation": "321",
             "entry_time": "2025-12-14T13:26:53.769800",
             "type_vehicule": "\u00e9lectrique"
-        },
-        {
-            "immatriculation": "456",
-            "entry_time": "2025-12-14T13:26:59.880765",
-            "type_vehicule": "visiteur"
-        },
-        {
-            "immatriculation": "aa",
-            "entry_time": "2025-12-14T21:13:36.889788",
-            "type_vehicule": "visiteur"
         }
     ],
     "current_capacity": [
-        2,
+        0,
         1,
         4,
         2
