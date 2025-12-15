@@ -60,7 +60,11 @@ class Vehicule:
                         data["type_vehicule"])
 
     def get_duration(self):
-        """Renvoie la durée depuis entry_time en secondes (int)."""
+        """
+        PRE:
+            Aucun prérequis spécifique.
+        POST:
+            Renvoie la durée passée dans le parking en heures entières."""
         now = datetime.now() # L'heure actuelle
         seconds = (now - self.entry_time).total_seconds()
         hours = seconds // 3600  # en heure

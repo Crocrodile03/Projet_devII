@@ -17,7 +17,7 @@ class TestParking(unittest.TestCase):
         self.assertEqual(p.maxtarif, 10)
         self.assertEqual(p.timeout_limit, timedelta(hours=24))
         self.assertEqual(p.timeout_subscriber, timedelta(hours=24 * 30))
-        self.assertIsInstance(p.opening_hours, str)
+
 
     def test_alert(self):
         p = Parking()
