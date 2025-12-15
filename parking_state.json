@@ -22,7 +22,11 @@
         },
         {
             "immatriculation": "aaa",
+<<<<<<< HEAD
             "entry_time": "2025-12-14T23:03:55.826837",
+=======
+            "entry_time": "2025-12-15T11:36:04.465901",
+>>>>>>> 9f1c9097a658df6108cdf35e823c041147cecf70
             "type_vehicule": "abonn\u00e9",
             "first_name": "aa",
             "last_name": "aaaa",

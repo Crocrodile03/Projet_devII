@@ -339,7 +339,7 @@ class Parking :
                 break
         if type_v == "abonné":
             return False
-        directory = "paiements"
+        directory = f"paiements/{mois_fr[datetime.datetime.now().month - 1]}"
         file = f"paiement_{immatriculation}_{mois_fr[datetime.datetime.now().month - 1]}.pdf"
         if not os.path.exists(directory):
             os.makedirs(directory)
