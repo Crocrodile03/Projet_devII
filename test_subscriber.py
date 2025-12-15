@@ -1,8 +1,8 @@
 import unittest
+from unittest.mock import MagicMock
 from datetime import datetime 
 from subscriber import Subscriber
 from parking import Parking
-from unittest.mock import MagicMock
 from exception import (InvalidValueSubscriberError, FullSubscriberCapacityError, 
                        SubscriberConflictError, CapacityError, InvalidImmatriculationError)
 

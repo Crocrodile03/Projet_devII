@@ -331,8 +331,6 @@ class TestParking(unittest.TestCase):
         
         p.save_state("test_save.json")
         mock_file.assert_called_once()
-
-    # ========== TESTS VALIDATION IMMATRICULATION ENTRÉE ==========
     
     def test_vehicules_entry_immatriculation_vide(self):
         """Test entrée véhicule avec immatriculation vide - doit lever une exception."""
