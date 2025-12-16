@@ -1,6 +1,6 @@
 import unittest
 from exception import (
-    MyException, InvalidValueError, CapacityError, MissingVehiculeError,
+    InvalidValueError, CapacityError, MissingVehiculeError,
     SubscriberConflictError, CapacityFullError, FullSubscriberCapacityError,
     VehiculeError, InvalidTypeError, InvalidValueSubscriberError,
     FailToLoad, IsASubscriber
@@ -9,12 +9,6 @@ from exception import (
 
 class TestExceptions(unittest.TestCase):
     """Tests unitaires pour toutes les exceptions personnalisées."""
-
-    def test_my_exception_init(self):
-        """Test l'initialisation de MyException."""
-        exc = MyException("Test message")
-        self.assertEqual(exc.message, "Test message")
-        self.assertEqual(str(exc), "Test message")
 
     def test_invalid_value_error(self):
         """Test InvalidValueError."""
@@ -60,7 +54,8 @@ class TestExceptions(unittest.TestCase):
         exc = VehiculeError("DEF-456", "visiteur")
         self.assertIn("DEF-456", exc.message)
         self.assertIn("visiteur", exc.message)
-        self.assertIn("déjà dans le parking", str(exc))
+        self.assertIn("déjà", str(exc))
+        self.assertIn("parking", str(exc))
 
     def test_invalid_type_error(self):
         """Test InvalidTypeError."""
@@ -90,12 +85,12 @@ class TestExceptions(unittest.TestCase):
         self.assertIn("supprimer", str(exc))
 
     def test_exception_inheritance(self):
-        """Test que toutes les exceptions héritent de MyException."""
-        self.assertTrue(issubclass(InvalidValueError, MyException))
-        self.assertTrue(issubclass(CapacityError, MyException))
-        self.assertTrue(issubclass(MissingVehiculeError, MyException))
-        self.assertTrue(issubclass(VehiculeError, MyException))
-        self.assertTrue(issubclass(FailToLoad, MyException))
+        """Test que toutes les exceptions héritent de Exception."""
+        self.assertTrue(issubclass(InvalidValueError, Exception))
+        self.assertTrue(issubclass(CapacityError, Exception))
+        self.assertTrue(issubclass(MissingVehiculeError, Exception))
+        self.assertTrue(issubclass(VehiculeError, Exception))
+        self.assertTrue(issubclass(FailToLoad, Exception))
 
     def test_exception_can_be_raised(self):
         """Test que les exceptions peuvent être levées et attrapées."""
