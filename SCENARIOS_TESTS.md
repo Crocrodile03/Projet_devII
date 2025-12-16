@@ -32,15 +32,12 @@ Ce document présente tous les scénarios de tests unitaires du système de gest
 |------------------|---------------------|---------------------|-------------------|
 | Durée avec minutes (arrondi) | Stationnement de 2h30 | Durée = 3 heures (arrondi supérieur) | `test_get_duration` |
 | Durée exacte en heures | Stationnement de 2h00 | Durée = 2 heures | `test_get_duration_exact_hours` |
-| Type de retour | Durée quelconque | Renvoie un entier | `test_get_duration_returns_integer` |
 
 ### Scénario 1.4 : Sérialisation et setters
 | **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |
 |------------------|---------------------|---------------------|-------------------|
 | Conversion en dict | Véhicule "DICT-001" | Dictionnaire avec toutes données | `test_vehicule_to_dict` |
 | Création depuis dict | Dictionnaire valide | Véhicule recréé correctement | `test_vehicule_from_dict` |
-| Modification immatriculation | Nouvelle immatriculation | Immatriculation mise à jour | `test_vehicule_setter_immatriculation` |
-| Modification type | Nouveau type | Type mis à jour | `test_vehicule_setter_type` |
 
 ---
 
@@ -160,14 +157,12 @@ Ce document présente tous les scénarios de tests unitaires du système de gest
 | Lettres uniquement | immat="ZZYYXX" | Sortie réussie | `test_vehicules_leave_immatriculation_lettres` |
 | Caractères spéciaux | immat="XX-99@#" | Sortie réussie | `test_vehicules_leave_immatriculation_caracteres_speciaux` |
 | Avec espaces | immat="YY 88 ZZ" | Sortie réussie | `test_vehicules_leave_immatriculation_espaces` |
-| Sensibilité casse | "ABC-123" vs "abc-123" | Exception si casse différente | `test_vehicules_leave_casse_sensible` |
 
 ### Scénario 3.8 : Détection de dépassement de temps (timeout)
 | **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |
 |------------------|---------------------|---------------------|-------------------|
 | Parking vide | Aucun véhicule | timeout() = False | `test_timeout_empty_parking` |
 | Visiteur dépassé | Entrée il y a 30h (>24h) | timeout() = True | `test_timeout` |
-| Abonné dépassé | Entrée il y a 31j (>30j) | timeout() = True | `test_timeout` |
 
 ### Scénario 3.9 : Sauvegarde et chargement d'état
 | **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |
@@ -210,29 +205,6 @@ Ce document présente tous les scénarios de tests unitaires du système de gest
 | FullSubscriberCapacityError | Aucun | Message contient "abonné" et "capacité" | `test_full_subscriber_capacity_error` |
 | FailToLoad | Aucun | Message "Erreur lors de la sauvegarde" | `test_fail_to_load` |
 | IsASubscriber | Aucun | Message contient "abonné" et "supprimer" | `test_is_a_subscriber` |
-
-### Scénario 4.4 : Héritage et utilisation
-| **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |
-|------------------|---------------------|---------------------|-------------------|
-| Héritage MyException | Toutes exceptions | Toutes héritent de MyException | `test_exception_inheritance` |
-| Lever et attraper | raise Exception | Exception levée et attrapée | `test_exception_can_be_raised` |
-
----
-
-## Types d'exceptions testées
-
-| **Exception** | **Situation** | **Tests concernés** |
-|--------------|---------------|-------------------|
-| `VehiculeError` | Véhicule déjà présent | Entrée de véhicule |
-| `InvalidTypeError` | Type de véhicule inconnu | Entrée de véhicule |
-| `SubscriberConflictError` | Abonné en conflit | Entrée d'abonné |
-| `MissingVehiculeError` | Véhicule introuvable | Sortie, calcul tarif |
-| `InvalidValueSubscriberError` | Données abonné invalides | Validation abonné |
-| `CapacityError` | Parking plein | Gestion capacité |
-| `FullSubscriberCapacityError` | Capacité abonnés atteinte | Abonnement |
-| `CapacityFullError` | Parking complètement plein | Gestion globale |
-| `FailToLoad` | Erreur sauvegarde | Persistance données |
-| `IsASubscriber` | Suppression abonné interdite | Gestion abonnés |
 
 ---
 
