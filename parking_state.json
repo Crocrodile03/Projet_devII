@@ -1,0 +1,43 @@
+{
+    "parking": [
+        {
+            "immatriculation": "Bardella",
+            "entry_time": "2025-12-09T00:49:12.736042",
+            "type_vehicule": "handicap\u00e9"
+        },
+        {
+            "immatriculation": "Hawkins",
+            "entry_time": "2025-12-09T00:49:24.733908",
+            "type_vehicule": "\u00e9lectrique"
+        },
+        {
+            "immatriculation": "eazza",
+            "entry_time": "2025-12-13T16:36:50.286785",
+            "type_vehicule": "\u00e9lectrique"
+        },
+        {
+            "immatriculation": "razeaaz",
+            "entry_time": "2025-12-13T16:36:53.886956",
+            "type_vehicule": "\u00e9lectrique"
+        },
+        {
+            "immatriculation": "aaa",
+            "entry_time": "2025-12-15T11:36:04.465901",
+            "type_vehicule": "abonn\u00e9",
+            "first_name": "aa",
+            "last_name": "aaaa",
+            "phone_number": "aa"
+        },
+        {
+            "immatriculation": "321",
+            "entry_time": "2025-12-14T13:26:53.769800",
+            "type_vehicule": "\u00e9lectrique"
+        }
+    ],
+    "current_capacity": [
+        0,
+        1,
+        4,
+        2
+    ]
+}
