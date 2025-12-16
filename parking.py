@@ -140,7 +140,7 @@ class Parking :
             return True
         return False
 
-    def find_vehicule_by_type(self, type_v: str, p: list):
+    def find_vehicule_by_type(self, type_v: str):
         """ 
         PRE:
             L'entrée type corresepond soit à visiteur, handicapé, électrique ou abonné
@@ -148,20 +148,20 @@ class Parking :
             Une liste des instances Vehicule correspondant au type spécifié.
         """
         type_of_vehicule = []
-        for v in p.parking :
+        for v in self.parking :
             if v.type_vehicule == type_v :
                 type_of_vehicule.append(v)
         print(f"Véhicules de type '{type_v}' dans le parking : {type_of_vehicule}")
         return type_of_vehicule
 
-    def find_vehicule(self, immat: str, p: list):
+    def find_vehicule(self, immat: str):
         """
         PRE:
             L'immatriculation du vehicule est déjà instanciée dans le parking.
         POST:
             Retourne l'instance Vehicule correspondant à l'immatriculation donnée.    
         """
-        for v in p.parking:
+        for v in self.parking:
             if v.immatriculation == immat:
                 return v
 
@@ -316,7 +316,7 @@ class Parking :
 
         raise MissingVehiculeError(immatriculation)
 
-    def generer_paiement(self, immatriculation: str, p: list, amont: float):
+    def generer_paiement(self, immatriculation: str, amont: float):
         """
         PRE:
             L'immatriculation est associée à une instance de Vehicule dans le parking,
@@ -337,7 +337,7 @@ class Parking :
     ]
         type_v = ""
         time_in_parking = 0
-        for v in p:
+        for v in self.parking:
             if v.immatriculation == immatriculation:
                 time_in_parking = v.get_duration()
                 type_v = v.type_vehicule

@@ -336,7 +336,7 @@ class Application(tk.Tk):
         if selected_type == "Tous":
             vehicles = mon_parking.parking
         else:
-            vehicles = mon_parking.find_vehicule_by_type(selected_type, mon_parking)
+            vehicles = mon_parking.find_vehicule_by_type(selected_type)
 
         # Ajouter les véhicules au Treeview
         for v in vehicles:
@@ -367,7 +367,7 @@ class Application(tk.Tk):
         if selected_type == "Tous":
             vehicles = mon_parking.parking[:]
         else:
-            vehicles = mon_parking.find_vehicule_by_type(selected_type, mon_parking)[:]
+            vehicles = mon_parking.find_vehicule_by_type(selected_type)[:]
 
         # Inverser l'ordre si déjà trié
         reverse = self.sort_order.get(col, False)
@@ -451,14 +451,14 @@ class Application(tk.Tk):
             messagebox.showerror("Erreur", "Véhicule introuvable.")
             return
 
-        if mon_parking.find_vehicule(self.selected_immat, mon_parking).type_vehicule == 'abonné':
+        if mon_parking.find_vehicule(self.selected_immat).type_vehicule == 'abonné':
             self.log_info("Erreur lors de la sortie: On ne peut pas supprimer un abonné")
             messagebox.showinfo("Retirer", "Vous ne pouvez pas retirer un abonné")
             return
 
         try:
             tarif = mon_parking.calculate_tarif(self.selected_immat)
-            pdf_path = mon_parking.generer_paiement(self.selected_immat, mon_parking.parking, tarif)
+            pdf_path = mon_parking.generer_paiement(self.selected_immat, tarif)
             self.ouvrir_pdf(pdf_path)
             mon_parking.vehicules_leave(self.selected_immat)
             self.log_info(f"Véhicule {self.selected_immat} sorti du parking.")
@@ -677,13 +677,13 @@ class SortieVehicule(tk.Frame):
         if not immat:
             self.controller.log_info("Erreur : immatriculation vide.")
             return
-        if mon_parking.find_vehicule(immat, mon_parking).type_vehicule == 'abonné':
+        if mon_parking.find_vehicule(immat).type_vehicule == 'abonné':
             self.controller.log_info("Erreur lors de la sortie: On ne peut pas supprimer un abonné")
             messagebox.showinfo("Retirer", "Vous ne pouvez pas retirer un abonné")
             return
 
         a = mon_parking.calculate_tarif(immat)
-        pdf_path = mon_parking.generer_paiement(immat, mon_parking.parking, a)
+        pdf_path = mon_parking.generer_paiement(immat, a)
         self.ouvrir_pdf(pdf_path)
         mon_parking.vehicules_leave(immat)
         self.controller.log_info(f"Véhicule {immat} sorti du parking.")
@@ -852,7 +852,7 @@ class ListeVehicules(tk.Frame):
         if selected_type == "Tous":
             vehicles = mon_parking.parking
         else:
-            vehicles = mon_parking.find_vehicule_by_type(selected_type, mon_parking)
+            vehicles = mon_parking.find_vehicule_by_type(selected_type)
 
         # Ajouter les véhicules au Treeview
         for v in vehicles:
@@ -881,7 +881,7 @@ class ListeVehicules(tk.Frame):
         if selected_type == "Tous":
             vehicles = mon_parking.parking[:]
         else:
-            vehicles = mon_parking.find_vehicule_by_type(selected_type, mon_parking)[:]
+            vehicles = mon_parking.find_vehicule_by_type(selected_type)[:]
 
         # Inverser l'ordre si déjà trié
         reverse = self.sort_order.get(col, False)
