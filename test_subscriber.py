@@ -164,7 +164,6 @@ class TestSubscriber(unittest.TestCase):
         self.assertEqual(s.phone_number, "0999888777")
         self.assertEqual(s.tarif_abonnement, 75)
 
-    # ========== TESTS VALIDATION IMMATRICULATION ABONNÉ ==========
 
     def test_subscriber_immatriculation_vide(self):
         """Test création abonné avec immatriculation vide - doit lever une exception."""
