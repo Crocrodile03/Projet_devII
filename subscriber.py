@@ -81,12 +81,16 @@ class Subscriber(Vehicule) :
             raise InvalidValueSubscriberError("tarif d'abonnement",value)
         self.__tarif_abonnement = value
 
-    def subscribe(self, p):
-        """PRE: immatriculation est une chaîne de caractères valide.
-        p est un objet Parking valide.
-        POST: Ajoute l'abonné au parking s'il n'y a pas de conflit et si la capacité le permet.
-        Lève SubscriberConflictError si le véhicule est déjà abonné ou présent dans le parking.
-        Lève CapacityError si la capacité maximale pour les abonnés est atteinte.
+    def subscribe(self, p: list):
+        """
+        PRE:
+            p est une liste d'instance de parking.
+        POST:
+            Ajoute l'abonné au parking,
+            incrémente (+1) le nombre d'abonné.
+        Exceptions:
+            Lève une exception si le véhicule est déjà abonné ou présent dans le parking.
+            Lève exception si la capacité maximale pour les abonnés est atteinte.
         """
         if p.alert('abonné'):
             raise FullSubscriberCapacityError
@@ -99,11 +103,14 @@ class Subscriber(Vehicule) :
         p.parking.append(self)
         p.current_capacity[3] += 1
         print(f"L'abonné {self.first_name} {self.last_name} ({self.immatriculation}) a été ajouté.")
+
     def calculate_subscribe_fee(self):
         """
-        PRE: Aucun prérequis spécifique. 
-        POST: Renvoie le montant fixe de l'abonnement annuel pour un abonné.
-        60 euros est le tarif fixe pour l'abonnement annuel.
+        À enlever !
+        PRE:
+            Aucun prérequis spécifique. 
+        POST:
+            Renvoie le montant fixe de l'abonnement annuel pour un abonné.
         """
         return self.tarif_abonnement  # Tarif fixe pour l'abonnement annuel
 
