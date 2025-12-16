@@ -56,8 +56,8 @@ Ce document présente tous les scénarios de tests unitaires du système de gest
 ### Scénario 2.2 : Validation d'immatriculation abonné
 | **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |
 |------------------|---------------------|---------------------|-------------------|
-| Immatriculation vide | immat="" | Exception InvalidImmatriculationError | `test_subscriber_immatriculation_vide` |
-| Immatriculation espaces uniquement | immat="   " | Exception InvalidImmatriculationError | `test_subscriber_immatriculation_espaces_uniquement` |
+| Immatriculation vide | immat="" | Error immatriculation peut pas être vide | `test_subscriber_immatriculation_vide` |
+| Immatriculation espaces uniquement | immat="   " | Error immatriculation peut pas être vide | `test_subscriber_immatriculation_espaces_uniquement` |
 | Chiffres uniquement | immat="123456789" | Abonné créé correctement | `test_subscriber_immatriculation_chiffres_uniquement` |
 | Lettres uniquement | immat="ABCDEFGH" | Abonné créé correctement | `test_subscriber_immatriculation_lettres_uniquement` |
 | Caractères spéciaux | immat="AB-123@#$" | Abonné créé correctement | `test_subscriber_immatriculation_caracteres_speciaux` |
@@ -143,18 +143,7 @@ Ce document présente tous les scénarios de tests unitaires du système de gest
 | Électrique vers visiteur | Places électrique pleines | Converti en visiteur | `test_vehicules_entry_electrique_fallback_visiteur` |
 | Handicapé parking plein | Handicapé + visiteur pleins | Exception CapacityError | `test_vehicules_entry_handicape_capacity_full` |
 
-### Scénario 3.6 : Entrée de véhicules - validation immatriculation
-| **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |
-|------------------|---------------------|---------------------|-------------------|
-| Immatriculation vide | immat="" | Exception InvalidImmatriculationError | `test_vehicules_entry_immatriculation_vide` |
-| Immatriculation espaces uniquement | immat="   " | Exception InvalidImmatriculationError | `test_vehicules_entry_immatriculation_espaces_uniquement` |
-| Chiffres uniquement | immat="123456" | Véhicule ajouté, capacity +1 | `test_vehicules_entry_immatriculation_chiffres_uniquement` |
-| Lettres uniquement | immat="ABCDEF" | Véhicule ajouté, capacity +1 | `test_vehicules_entry_immatriculation_lettres_uniquement` |
-| Caractères spéciaux | immat="AB-123@!" | Véhicule ajouté, capacity +1 | `test_vehicules_entry_immatriculation_caracteres_speciaux` |
-| Avec espaces | immat="AB 123 CD" | Véhicule ajouté, capacity +1 | `test_vehicules_entry_immatriculation_espaces` |
-| Très longue | immat=100 caractères | Véhicule ajouté au parking | `test_vehicules_entry_immatriculation_tres_longue` |
-
-### Scénario 3.7 : Sortie de véhicules - validation standard
+### Scénario 3.6 : Calcul des tarifs
 | **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |
 |------------------|---------------------|---------------------|-------------------|
 | Sortie normale visiteur | immat="AA-123" présente | Véhicule retiré, capacity décrémentée | `test_vehicules_leave` |
@@ -162,7 +151,7 @@ Ce document présente tous les scénarios de tests unitaires du système de gest
 | Sortie électrique | immat électrique présente | Véhicule retiré, capacity[2] -1 | `test_vehicules_leave_electrique` |
 | Véhicule absent | immat="NOPE-000" inexistante | Exception MissingVehiculeError | `test_vehicules_leave` |
 
-### Scénario 3.8 : Sortie de véhicules - validation immatriculation
+### Scénario 3.7 : Sortie de véhicules - validation immatriculation
 | **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |
 |------------------|---------------------|---------------------|-------------------|
 | Immatriculation vide | immat="" | Exception MissingVehiculeError | `test_vehicules_leave_immatriculation_vide` |
@@ -173,23 +162,14 @@ Ce document présente tous les scénarios de tests unitaires du système de gest
 | Avec espaces | immat="YY 88 ZZ" | Sortie réussie | `test_vehicules_leave_immatriculation_espaces` |
 | Sensibilité casse | "ABC-123" vs "abc-123" | Exception si casse différente | `test_vehicules_leave_casse_sensible` |
 
-### Scénario 3.9 : Calcul des tarifs
-| **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |
-|------------------|---------------------|---------------------|-------------------|
-| Tarif normal | Durée=3h, tarif=1€/h | Montant = 3€ | `test_calculate_tarif` |
-| Tarif maximum | Durée=20h, maxtarif=10€ | Montant = 10€ (plafonné) | `test_calculate_tarif` |
-| Durée en int | Durée=5 (entier) | Montant = 5€ | `test_calculate_tarif_with_int_duration` |
-| Durée en float | Durée=3.5 (décimal) | Montant = 3.5€ | `test_calculate_tarif_with_float_duration` |
-| Véhicule inexistant | immat="NOPE" | Exception MissingVehiculeError | `test_calculate_tarif` |
-
-### Scénario 3.10 : Détection de dépassement de temps (timeout)
+### Scénario 3.8 : Détection de dépassement de temps (timeout)
 | **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |
 |------------------|---------------------|---------------------|-------------------|
 | Parking vide | Aucun véhicule | timeout() = False | `test_timeout_empty_parking` |
 | Visiteur dépassé | Entrée il y a 30h (>24h) | timeout() = True | `test_timeout` |
 | Abonné dépassé | Entrée il y a 31j (>30j) | timeout() = True | `test_timeout` |
 
-### Scénario 3.11 : Sauvegarde et chargement d'état
+### Scénario 3.9 : Sauvegarde et chargement d'état
 | **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |
 |------------------|---------------------|---------------------|-------------------|
 | Sauvegarde réussie | Parking avec véhicules | Fichier JSON créé | `test_save_state_success` |
@@ -197,7 +177,7 @@ Ce document présente tous les scénarios de tests unitaires du système de gest
 | Chargement fichier vide | Fichier vide | Parking vide initialisé | `test_load_state_empty_file` |
 | Chargement JSON invalide | JSON corrompu | Parking vide, capacité [0,0,0,0] | `test_load_state_invalid_json` |
 
-### Scénario 3.12 : Génération de reçu de paiement
+### Scénario 3.10 : Génération de reçu de paiement
 | **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |
 |------------------|---------------------|---------------------|-------------------|
 | Génération PDF | immat="AA-123", montant=4€ | Fichier PDF créé dans dossier paiements | `test_generer_paiement` |
