@@ -5,6 +5,7 @@ l'application.
 """
 import datetime
 from datetime import datetime
+from exception import InvalidImmatriculationError
 
 class Vehicule:
     """
@@ -17,6 +18,8 @@ class Vehicule:
     def __init__(self, immatriculation: str,
                 entry_time: datetime=datetime.now(),
                 type_vehicule: str="visiteur"):
+        if not isinstance(immatriculation, str) or len(immatriculation.strip()) == 0:
+            raise InvalidImmatriculationError()
         self.__immatriculation = immatriculation
         self.__type_vehicule = type_vehicule
         self.__entry_time = entry_time
@@ -28,6 +31,8 @@ class Vehicule:
     @immatriculation.setter
     def immatriculation(self, immatriculation):
         """Set l'immatriculation du véhicule."""
+        if not isinstance(immatriculation, str) or len(immatriculation.strip()) == 0:
+            raise InvalidImmatriculationError()
         self.__immatriculation = immatriculation
 
     @property
