@@ -100,26 +100,29 @@ class Parking :
         self.__timeout_subscriber = value
     def timeout(self):
         """
-        PRE: L'objet vehicule est valide et possède un entry_time. 
-        POST: La durée totale de stationnement (un objet timedelta) est calculée. 
-              Si cette durée dépasse une limite prédéfinie, une alerte est déclenchée ???
+        PRE:
+            Aucune précondition spécifique. 
+        POST:
+            Retourne la première instance du véhicule qui a dépassé la limite de temps autorisée.
+            Sinon, retourne False. 
         """
         if len(self.parking) == 0:
-            print("Le parking est vide")
+            return False
         now = datetime.datetime.now()
         for v in self.parking:
             temps = now - v.entry_time
             if temps > self.timeout_limit and v.type_vehicule != 'abonné':
-                return True
+                return v
             if v.type_vehicule == 'abonné' and temps > self.timeout_subscriber:
-                return True
+                return v
         return False
 
     def alert(self, type_v: str):
         """
-        PRE: Les capacités sont des nombres entiers non négatifs. 
-             current_capacity est inférieur ou égal à max_capacity. 
-        POST: Retourne True si les places d'un type donnés sont pleines.
+        PRE:
+            Le type de véhicule est valide (visiteur, handicapé, électrique ou abonné). 
+        POST:
+            Retourne True si les places d'un type données sont pleines.
             sinon il retourne False.
         """
         if (type_v == 'visiteur' and
@@ -138,14 +141,11 @@ class Parking :
         return False
 
     def find_vehicule_by_type(self, type_v: str, p: list):
-        """
-        Paramètre : type; Type : str;
-            Description : Catégorie de véhicule à rechercher.
-        Paramètre : parking; Type : list;
-            Description : Liste des emplacements contenus dans l'attribu parking de l'objet Parking. 
-        PRE: L'entrée type est une chaîne de caractères valide.
-            L'entrée parking (p) est une lsit itérable d'instances véhicules.
-        POST: Une liste ou un itérateur des objets Vehicule correspondant au type spécifié.
+        """ 
+        PRE:
+            L'entrée type corresepond soit à visiteur, handicapé, électrique ou abonné
+        POST:
+            Une liste des instances Vehicule correspondant au type spécifié.
         """
         type_of_vehicule = []
         for v in p.parking :
@@ -155,25 +155,27 @@ class Parking :
         return type_of_vehicule
 
     def find_vehicule(self, immat: str, p: list):
+        """
+        PRE:
+            L'immatriculation du vehicule est déjà instanciée dans le parking.
+        POST:
+            Retourne l'instance Vehicule correspondant à l'immatriculation donnée.    
+        """
         for v in p.parking:
             if v.immatriculation == immat:
                 return v
 
     def vehicules_entry(self, immatriculation: str, type_vehicule:  str):
         """
-        Paramètre : immatriculation; Type: str; 
-            Description : chaîne de caractères représentant l'immatriculation du véhicule.
-        Paramètre : type_vehicule; Type: str; 
-            Description : chaîne de caractères représentant le type de place
-            PRE: L'objet vehicule est valide. 
+        PRE:  
             Une place disponible correspondant au type de vehicule existe
-            (sauf pour les abonnés ayant des places fixes).
-        POST: Un Emplacement libre est trouvé (ou attribué pour un abonné). 
-              L'emplacement est mis à jour comme occupé via manage_emplacement. 
-              Si le véhicule n'est pas un abonné, self.current_capacity est incrémentée de 1. 
-              L'objet Emplacement attribué est retourné.
-        Exceptions: Lève une exception si le parking est plein
-                    ou si aucune place appropriée n'est trouvée.
+        POST:
+            L'instance Vehicule est rajouté à la liste parking,
+            sauf pour les abonnés ayant des places fixes.
+            la capacité du type de véhicule est incrémenté (+1).
+        Exceptions:
+            Lève une exception si le parking est plein
+            ou si aucune place appropriée n'est trouvée.
         """
         vehicule = Vehicule(immatriculation, datetime.datetime.now(), type_vehicule)
         for v in self.parking:
@@ -215,17 +217,17 @@ class Parking :
         self.timeout()
         return vehicule
 
-    def vehicules_leave(self, immatriculation):
+    def vehicules_leave(self, immatriculation: str):
         """
-        Paramètre : immatriculation; Type : str;
-        Attribut immatriculation de l'instance Vehicule qui quitte le parking.
-        PRE: L'immatriculation est valide. 
-             L'immatriculation est associé à une instance de vehicule est occupé dans self.parking.
-        POST: La place de parking associé est mis à jour comme libre
-              (uniquement pour les non-abonnés). 
-              Si le véhicule n'est pas un abonné, self.current_capacity
-              ou splecial_current_capacity est décrémentée de 1. 
-              Retourne True si la sortie est enregistrée, False sinon.
+        PRE:
+            L'immatriculation est associé à une instance de vehicule qui se trouve dans le parking.
+        POST:
+            L'instance Vehicule correspondante est effacée de la liste parking,
+            et le compteur de véhicule par type est décrémenté (-1).
+            Retourne True si la sortie est enregistrée.
+        Exceptions:
+            Lève une exception si l'immatriculation n'est pas trouvée dans le parking.
+            Lève une exception si le véhicule est un abonné.
         """
         for v in self.parking:
             if v.immatriculation == immatriculation :
@@ -291,8 +293,15 @@ class Parking :
             self.__current_capacity = [0, 0, 0, 0]
             self.__parking = []
 
-    def calculate_tarif(self, immatriculation):
-        """Calcule le tarif à payer pour un véhicule donné en fonction de son immatriculation."""
+    def calculate_tarif(self, immatriculation: str):
+        """
+        PRE:
+            L'immatriculation est associée à une instance de Vehicule dans le parking.
+        POST:
+            Renvoie le tarif à payer qui est calculé en fonction du temps passé dans le parking.
+        Exceptions:
+            Lève une exception si l'immatriculation n'est pas trouvée dans le parking.
+        """
         for v in self.parking:
             if v.immatriculation == immatriculation:
                 time_in_parking = v.get_duration()
@@ -307,23 +316,19 @@ class Parking :
 
         raise MissingVehiculeError(immatriculation)
 
-    def generer_paiement(self,immatriculation, p, amont):
+    def generer_paiement(self, immatriculation: str, p: list, amont: float):
         """
-        Paramètre : immatriculation; Type : str;
-            Description : immatriculation du véhicule qui quitte le parking.
-        Paramètre : p; Type : list;
-            Description : liste des emplacements contenus dans l'attribu parking de l'objet Parking.
-        Paramètre : amont; Type : float;
-            Description : montant total à payer.
-        PRE: L'immatriculation est valide et associée à une instance de Vehicule dans p.
-             amont est un float >= 0.
-        POST: Un ticket de paiement au format PDF est généré
-        et sauvegardé dans le répertoire "paiements".
-              Le ticket contient les informations d'immatriculation,
-              type de véhicule,
-              date de paiement,
-              temps passé dans le parking et montant payé.
-              Le chemin du fichier PDF est retourné.
+        PRE:
+            L'immatriculation est associée à une instance de Vehicule dans le parking,
+            amont est un nombre strictement supérieur à 0.
+        POST:
+            Un ticket de paiement au format PDF est généré
+            et sauvegardé dans le répertoire "paiements" et le sous-répertoire de son mois.
+            Le ticket contient les informations d'immatriculation,
+            type de véhicule,
+            date de paiement,
+            temps passé dans le parking et montant payé.
+            Le chemin du fichier PDF est retourné.
         Exceptions: Lève une exception si l'immatriculation n'est pas trouvée dans p.
         """
         mois_fr = [
@@ -339,7 +344,7 @@ class Parking :
                 break
         if type_v == "abonné":
             return False
-        directory = f"paiements/{mois_fr[datetime.datetime.now().month - 1]}"
+        directory = "paiements"
         file = f"paiement_{immatriculation}_{mois_fr[datetime.datetime.now().month - 1]}.pdf"
         if not os.path.exists(directory):
             os.makedirs(directory)
