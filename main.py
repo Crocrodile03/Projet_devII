@@ -449,6 +449,7 @@ class Application(tk.Tk):
 
         if not vehicule:
             messagebox.showerror("Erreur", "Véhicule introuvable.")
+            self.log_info(f"Erreur : tentative de sortie d'un véhicule inexistant ({self.selected_immat}).")
             return
 
         if mon_parking.find_vehicule(self.selected_immat).type_vehicule == 'abonné':
