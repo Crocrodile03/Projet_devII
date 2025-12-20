@@ -296,11 +296,15 @@ class Parking :
     def calculate_tarif(self, immatriculation: str):
         """
         PRE:
-            L'immatriculation est associée à une instance de Vehicule dans le parking.
+            L'immatriculation est une chaîne de caractères non vide qui est associée à une instance de
+            véhicule dans le parking.
+            Le tarif est un nombre positif représentant le coût horaire du stationnement.
+            Il change en fonction du temps passé dans le parking.
         POST:
+            La fonction retourne le tarif à payer qui est calculé par le temps dont la voiture est garé dans le parking.
             Renvoie le tarif à payer qui est calculé en fonction du temps passé dans le parking.
         Exceptions:
-            Lève une exception si l'immatriculation n'est pas trouvée dans le parking.
+            Exceptions: si l'immatriculation n'est pas trouvée dans le parking alors une exception est levée.
         """
         for v in self.parking:
             if v.immatriculation == immatriculation:
@@ -319,17 +323,21 @@ class Parking :
     def generer_paiement(self, immatriculation: str, amont: float):
         """
         PRE:
-            L'immatriculation est associée à une instance de Vehicule dans le parking,
-            amont est un nombre strictement supérieur à 0.
+            L'immatriculation est une chaîne de caractères non vide qui est associée à une instance de
+            véhicule dans le parking.
+            La voiture est associée à un montant strictement supérieur à 0.
+            Selon le temps garer dans le parking le montant change également.
         POST:
-            Un ticket de paiement au format PDF est généré
-            et sauvegardé dans le répertoire "paiements" et le sous-répertoire de son mois.
-            Le ticket contient les informations d'immatriculation,
-            type de véhicule,
-            date de paiement,
-            temps passé dans le parking et montant payé.
-            Le chemin du fichier PDF est retourné.
-        Exceptions: Lève une exception si l'immatriculation n'est pas trouvée dans p.
+            Un fichier PDF est généré pour être le ticket de paiement.
+            Il est sauvegardé dans le fichier JSON/répertoire "paiements" et le sous-répertoire de son mois.
+            Le fichier PDF(le ticket) contient : 
+            l'immatriculation de la voiture,
+            le type de la voiture,
+            la date de paiement,
+            Le temps total passé dans le parking,
+            le montant payé.
+            La fonction retourne une chaîne de caractères représentant le chemin complet du fichier PDF généré
+            Exceptions: si l'immatriculation n'est pas trouvée dans le parking alors une exception est levée.
         """
         mois_fr = [
         "janvier", "février", "mars", "avril", "mai", "juin",
