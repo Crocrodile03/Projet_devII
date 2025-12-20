@@ -114,13 +114,13 @@ class Subscriber(Vehicule) :
         """
         return self.tarif_abonnement  # Tarif fixe pour l'abonnement annuel
 
+#création de dictionnaire pour le fichier JSON
     def to_dict(self):
         data = super().to_dict()
         data.update({
             "first_name": self.__first_name,
             "last_name": self.__last_name,
             "phone_number": self.__phone_number,
-            # "tarif_abonnement": self.__tarif_abonnement
         })
         return data
 
