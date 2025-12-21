@@ -117,12 +117,12 @@ class Parking :
                 return v
         return False
 
-    def alert(self, type_v: str):
+    def alert_capacity_full(self, type_v: str):
         """
         PRE:
-            Le type de véhicule est valide (visiteur, handicapé, électrique ou abonné). 
+            Le type de véhicule est soit visiteur, handicapé, électrique ou abonné. 
         POST:
-            Retourne True si les places d'un type données sont pleines.
+            Retourne True si les places d'un type donné sont pleines.
             sinon il retourne False.
         """
         if (type_v == 'visiteur' and
@@ -140,7 +140,7 @@ class Parking :
             return True
         return False
 
-    def find_vehicule_by_type(self, type_v: str, p: list):
+    def find_vehicule_by_type(self, type_v: str):
         """ 
         PRE:
             L'entrée type corresepond soit à visiteur, handicapé, électrique ou abonné
@@ -148,49 +148,49 @@ class Parking :
             Une liste des instances Vehicule correspondant au type spécifié.
         """
         type_of_vehicule = []
-        for v in p.parking :
+        for v in self.parking :
             if v.type_vehicule == type_v :
                 type_of_vehicule.append(v)
         print(f"Véhicules de type '{type_v}' dans le parking : {type_of_vehicule}")
         return type_of_vehicule
 
-    def find_vehicule(self, immat: str, p: list):
+    def find_vehicule(self, immat: str):
         """
         PRE:
             L'immatriculation du vehicule est déjà instanciée dans le parking.
         POST:
             Retourne l'instance Vehicule correspondant à l'immatriculation donnée.    
         """
-        for v in p.parking:
+        for v in self.parking:
             if v.immatriculation == immat:
                 return v
+        raise MissingVehiculeError(immat)
 
     def vehicules_entry(self, immatriculation: str, type_vehicule:  str):
         """
         PRE:  
-            Une place disponible correspondant au type de vehicule existe
+            Aucun prérequis spécifique.
         POST:
             L'instance Vehicule est rajouté à la liste parking,
             sauf pour les abonnés ayant des places fixes.
             la capacité du type de véhicule est incrémenté (+1).
         Exceptions:
-            Lève une exception si le parking est plein
-            ou si aucune place appropriée n'est trouvée.
+            Lève VehiculeError si le véhicule est déjà dans le parking.
+            Lève CapacityError si le parking est plein
+            ou InvalidTypeError si aucune place appropriée n'est trouvée.
         """
         vehicule = Vehicule(immatriculation, datetime.datetime.now(), type_vehicule)
         for v in self.parking:
             if v.immatriculation == vehicule.immatriculation:
-                if v.type_vehicule == "abonné":
-                    raise SubscriberConflictError(v.immatriculation)
                 raise VehiculeError(v.immatriculation, v.type_vehicule)
         if vehicule.type_vehicule == 'visiteur':
-            if self.alert(vehicule.type_vehicule):
+            if self.alert_capacity_full(vehicule.type_vehicule):
                 raise CapacityError(vehicule.type_vehicule)
             self.current_capacity[0] += 1
             self.parking.append(vehicule)
         elif vehicule.type_vehicule == 'handicapé':
-            if self.alert(vehicule.type_vehicule):
-                if self.alert('visiteur'):
+            if self.alert_capacity_full(vehicule.type_vehicule):
+                if self.alert_capacity_full('visiteur'):
                     # Si plus de place handicapé, on vérifie place visiteur
                     # Si il reste des places visiteur alors on change son type en visiteur
                     raise CapacityError(f"{vehicule.type_vehicule} et visiteur")
@@ -201,8 +201,8 @@ class Parking :
                 self.current_capacity[1] += 1
                 self.parking.append(vehicule)
         elif vehicule.type_vehicule == 'électrique':
-            if self.alert(vehicule.type_vehicule):
-                if self.alert('visiteur'):
+            if self.alert_capacity_full(vehicule.type_vehicule):
+                if self.alert_capacity_full('visiteur'):
                     # Si plus de place électrique, on vérifie place visiteur
                     # Si il reste des places visiteur alors on change son type en visiteur
                     raise CapacityError(f"{vehicule.type_vehicule} et visiteur")
@@ -226,8 +226,8 @@ class Parking :
             et le compteur de véhicule par type est décrémenté (-1).
             Retourne True si la sortie est enregistrée.
         Exceptions:
-            Lève une exception si l'immatriculation n'est pas trouvée dans le parking.
-            Lève une exception si le véhicule est un abonné.
+            Lève une exception MissingVehiculeError si l'immatriculation n'est pas trouvée dans le parking.
+            Lève une exception IsASubscriber si le véhicule est un abonné.
         """
         for v in self.parking:
             if v.immatriculation == immatriculation :
@@ -296,11 +296,15 @@ class Parking :
     def calculate_tarif(self, immatriculation: str):
         """
         PRE:
-            L'immatriculation est associée à une instance de Vehicule dans le parking.
+            L'immatriculation est une chaîne de caractères non vide qui est associée à une instance de
+            véhicule dans le parking.
+            Le tarif est un nombre positif représentant le coût horaire du stationnement.
+            Il change en fonction du temps passé dans le parking.
         POST:
+            La fonction retourne le tarif à payer qui est calculé par le temps dont la voiture est garé dans le parking.
             Renvoie le tarif à payer qui est calculé en fonction du temps passé dans le parking.
         Exceptions:
-            Lève une exception si l'immatriculation n'est pas trouvée dans le parking.
+            Exceptions: si l'immatriculation n'est pas trouvée dans le parking alors une exception est levée.
         """
         for v in self.parking:
             if v.immatriculation == immatriculation:
@@ -316,20 +320,24 @@ class Parking :
 
         raise MissingVehiculeError(immatriculation)
 
-    def generer_paiement(self, immatriculation: str, p: list, amont: float):
+    def generer_paiement(self, immatriculation: str, amont: float):
         """
         PRE:
-            L'immatriculation est associée à une instance de Vehicule dans le parking,
-            amont est un nombre strictement supérieur à 0.
+            L'immatriculation est une chaîne de caractères non vide qui est associée à une instance de
+            véhicule dans le parking.
+            La voiture est associée à un montant strictement supérieur à 0.
+            Selon le temps garer dans le parking le montant change également.
         POST:
-            Un ticket de paiement au format PDF est généré
-            et sauvegardé dans le répertoire "paiements" et le sous-répertoire de son mois.
-            Le ticket contient les informations d'immatriculation,
-            type de véhicule,
-            date de paiement,
-            temps passé dans le parking et montant payé.
-            Le chemin du fichier PDF est retourné.
-        Exceptions: Lève une exception si l'immatriculation n'est pas trouvée dans p.
+            Un fichier PDF est généré pour être le ticket de paiement.
+            Il est sauvegardé dans le fichier JSON/répertoire "paiements" et le sous-répertoire de son mois.
+            Le fichier PDF(le ticket) contient : 
+            l'immatriculation de la voiture,
+            le type de la voiture,
+            la date de paiement,
+            Le temps total passé dans le parking,
+            le montant payé.
+            La fonction retourne une chaîne de caractères représentant le chemin complet du fichier PDF généré
+            Exceptions: si l'immatriculation n'est pas trouvée dans le parking alors une exception est levée.
         """
         mois_fr = [
         "janvier", "février", "mars", "avril", "mai", "juin",
@@ -337,7 +345,7 @@ class Parking :
     ]
         type_v = ""
         time_in_parking = 0
-        for v in p:
+        for v in self.parking:
             if v.immatriculation == immatriculation:
                 time_in_parking = v.get_duration()
                 type_v = v.type_vehicule
@@ -381,3 +389,71 @@ class Parking :
         c.drawCentredString(largeur / 2,y,"Merci de votre visite")
         c.save()
         return file_path
+
+
+
+    def generer_ticket_abonner(self, immatriculation : str, first_name : str, name : str, phone : str):
+        """
+        Génère un ticket PDF pour un nouvel abonné avec ses informations personnelles
+        et le tarif de l'abonnement.
+
+        PRE:
+            - immatriculation, first_name, name, phone sont des chaînes de caractères non vides.
+            - immatriculation respecte le format du véhicule.
+        POST:
+            - Un fichier PDF est généré dans le répertoire :
+              "paiements/abonner/<mois_en_cours>/paiement_abonner_<immatriculation>_<mois>.pdf".
+            - Le PDF contient les informations suivantes :
+                * Immatriculation du véhicule
+                * Prénom et nom de l'abonné
+                * Numéro de téléphone
+                * Date du paiement
+                * Montant du tarif de l'abonnement
+            - La fonction renvoie le chemin complet du fichier PDF généré.
+        """
+        mois_fr = [
+            "janvier", "février", "mars", "avril", "mai", "juin",
+            "juillet", "août", "septembre", "octobre", "novembre", "décembre"
+        ]
+        abonne = Subscriber(immatriculation, first_name, name, phone)
+        amont = abonne.tarif_abonnement
+        directory = f"paiements/abonner/{mois_fr[datetime.datetime.now().month - 1]}"
+        file = f"paiement_abonner_{immatriculation}_{mois_fr[datetime.datetime.now().month - 1]}.pdf"
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        file_path = os.path.join(directory, file)
+        # Format ticket
+        largeur, hauteur = 90 * mm, 120 * mm
+        c = canvas.Canvas(file_path, pagesize=(largeur, hauteur))
+
+        # Décalage vertical pour placer le texte
+        y = hauteur - 10 * mm
+
+        # Titre
+        c.setFont("Helvetica-Bold", 14)
+        c.drawCentredString(largeur / 2, y, "TICKET Abonnement")
+        y -= 10 * mm
+        # Informations
+        c.setFont("Helvetica", 10)
+        c.drawString(5 * mm, y, f"Immatriculation : {immatriculation}")
+        y -= 5 * mm
+        c.drawString(5 * mm, y, f"Prénom : {first_name}")
+        y -= 5 * mm
+        c.drawString(5 * mm, y, f"Nom de famille : {name}")
+        y -= 5 * mm
+        c.drawString(5 * mm, y, f"Numéro de téléphone : {phone}")
+        y -= 5 * mm
+        c.drawString(5 * mm, y, f"Date de paiement : {datetime.datetime.now().strftime('%d/%m/%Y')}")
+        y -= 5 * mm
+        c.drawString(5 * mm, y, f"Montant : {amont} €")
+        y -= 10 * mm
+
+        c.line(5 * mm, y, largeur - 5 * mm, y)
+        y -= 5 * mm
+
+        # Message bas du ticket
+        c.setFont("Helvetica-Oblique", 9)
+        c.drawCentredString(largeur / 2, y, "Abonnement effectuer")
+        c.save()
+        return file_path
+

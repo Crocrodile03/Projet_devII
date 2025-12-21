@@ -92,7 +92,7 @@ class Subscriber(Vehicule) :
             Lève une exception si le véhicule est déjà abonné ou présent dans le parking.
             Lève exception si la capacité maximale pour les abonnés est atteinte.
         """
-        if p.alert('abonné'):
+        if p.alert_capacity_full('abonné'):
             raise FullSubscriberCapacityError
         for v in p.parking:
             if v.immatriculation == self.immatriculation:
@@ -102,7 +102,6 @@ class Subscriber(Vehicule) :
                     raise CapacityError(v.type_vehicule)
         p.parking.append(self)
         p.current_capacity[3] += 1
-        print(f"L'abonné {self.first_name} {self.last_name} ({self.immatriculation}) a été ajouté.")
 
     def calculate_subscribe_fee(self):
         """
@@ -114,13 +113,13 @@ class Subscriber(Vehicule) :
         """
         return self.tarif_abonnement  # Tarif fixe pour l'abonnement annuel
 
+#création de dictionnaire pour le fichier JSON
     def to_dict(self):
         data = super().to_dict()
         data.update({
             "first_name": self.__first_name,
             "last_name": self.__last_name,
             "phone_number": self.__phone_number,
-            # "tarif_abonnement": self.__tarif_abonnement
         })
         return data
 
