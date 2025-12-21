@@ -92,7 +92,7 @@ class Subscriber(Vehicule) :
             Lève une exception si le véhicule est déjà abonné ou présent dans le parking.
             Lève exception si la capacité maximale pour les abonnés est atteinte.
         """
-        if p.alert('abonné'):
+        if p.alert_capacity_full('abonné'):
             raise FullSubscriberCapacityError
         for v in p.parking:
             if v.immatriculation == self.immatriculation:

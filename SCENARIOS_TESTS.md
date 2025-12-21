@@ -118,11 +118,11 @@ Ce document présente tous les scénarios de tests unitaires du système de gest
 | timeout_subscriber valide | timedelta(days=60) | Accepté et stocké | `test_setters_timeout_subscriber_valid` |
 | timeout_subscriber invalide | Int au lieu de timedelta | Exception ValueError | `test_setters_timeout_subscriber_invalid` |
 
-### Scénario 3.3 : Système d'alerte de capacité
+### Scénario 3.3 : Système d'alert_capacity_full de capacité
 | **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |
 |------------------|---------------------|---------------------|-------------------|
-| Parking non plein | current_capacity=[0,0,0,0] | alert() = False pour tous types | `test_alert` |
-| Parking plein | current_capacity=[120,6,4,12] | alert() = True pour tous types | `test_alert` |
+| Parking non plein | current_capacity=[0,0,0,0] | alert_capacity_full() = False pour tous types | `test_alert` |
+| Parking plein | current_capacity=[120,6,4,12] | alert_capacity_full() = True pour tous types | `test_alert` |
 
 ### Scénario 3.4 : Recherche de véhicules
 | **Aspect testé** | **Données d'entrée** | **Résultat attendu** | **Méthode de test** |

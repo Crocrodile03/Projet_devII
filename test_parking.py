@@ -25,12 +25,12 @@ class TestParking(unittest.TestCase):
 
     def test_alert(self):
         p = Parking()
-        self.assertFalse(p.alert("visiteur"))
+        self.assertFalse(p.alert_capacity_full("visiteur"))
         p.current_capacity = [120, 6, 4, 12]
-        self.assertTrue(p.alert("visiteur"))
-        self.assertTrue(p.alert("handicapé"))
-        self.assertTrue(p.alert("électrique"))
-        self.assertTrue(p.alert("abonné"))
+        self.assertTrue(p.alert_capacity_full("visiteur"))
+        self.assertTrue(p.alert_capacity_full("handicapé"))
+        self.assertTrue(p.alert_capacity_full("électrique"))
+        self.assertTrue(p.alert_capacity_full("abonné"))
 
     def test_find_vehicule_by_type(self):
         mock_v1 = MagicMock(type_vehicule="visiteur")
@@ -38,7 +38,7 @@ class TestParking(unittest.TestCase):
         mock_v3 = MagicMock(type_vehicule="visiteur")
         p = Parking()
         p.parking = [mock_v1, mock_v2, mock_v3]
-        res = p.find_vehicule_by_type("visiteur", p)
+        res = p.find_vehicule_by_type("visiteur")
         self.assertEqual(len(res), 2)
         self.assertIn(mock_v1, res)
         self.assertIn(mock_v3, res)
@@ -140,7 +140,7 @@ class TestParking(unittest.TestCase):
         mock_v.immatriculation = "AA-123"
         mock_v.type_vehicule = "visiteur"
         mock_v.get_duration.return_value = timedelta(hours=2)
-        file_path = p.generer_paiement("AA-123", [mock_v], 4.0)
+        file_path = p.generer_paiement("AA-123", 4.0)
         self.assertIn("paiement_AA-123", file_path)
 
     def test_setters_current_capacity_valid(self):

@@ -26,7 +26,7 @@ from tkinter import ttk, messagebox
 import datetime
 from parking import Parking
 from subscriber import Subscriber
-from exception import IsASubscriber
+from exception import InvalidTypeError, IsASubscriber, MissingVehiculeError, VehiculeError, CapacityError
 
 mon_parking = Parking()
 mon_parking.load_state()
@@ -589,29 +589,41 @@ class EntreeVehicule(tk.Frame):
         if not immat:
             self.controller.log_info("Erreur : immatriculation vide.")
             return
-        mon_parking.vehicules_entry(immat, type_place)
-        last_v = len(mon_parking.parking) - 1
-        if mon_parking.parking[last_v].type_vehicule != type_place:
-            choix = messagebox.askyesno(
-                "Place pleine",
-                f"Attention, il n'y a plus de place {type_place},\n"
-                "voulez-vous rajouter le véhicule en place visiteur ?"
-            )
-
-            if not choix:
-                mon_parking.vehicules_leave(mon_parking.parking[last_v].immatriculation)
-                self.controller.log_info(
-                    f"Entrée annulée pour {mon_parking.parking[last_v].immatriculation}."
+        try:
+            mon_parking.vehicules_entry(immat, type_place)
+            last_v = len(mon_parking.parking) - 1
+            if mon_parking.parking[last_v].type_vehicule != type_place:
+                choix = messagebox.askyesno(
+                    "Place pleine",
+                    f"Attention, il n'y a plus de place {type_place},\n"
+                    "voulez-vous rajouter le véhicule en place visiteur ?"
                 )
-            # à changer    
+
+                if not choix:
+                    mon_parking.vehicules_leave(mon_parking.parking[last_v].immatriculation)
+                    self.controller.log_info(
+                        f"Entrée annulée pour {mon_parking.parking[last_v].immatriculation}."
+                    )
                 return
 
-        self.controller.log_info(
-            f"Véhicule {immat} entré en place {mon_parking.parking[last_v].type_vehicule}.")
+            self.controller.log_info(
+                f"Véhicule {immat} entré en place {mon_parking.parking[last_v].type_vehicule}.")
+        except VehiculeError as e:
+            messagebox.showerror("Erreur", str(e))
+            self.controller.log_info(f"Erreur lors de l'entrée: {str(e)}")
+
+        except CapacityError as e:
+            messagebox.showerror("Erreur", str(e))
+            self.controller.log_info(f"Erreur lors de l'entrée: {str(e)}")
+
+        except InvalidTypeError as e:
+            messagebox.showerror("Erreur", str(e))
+            self.controller.log_info(f"Erreur lors de l'entrée: {str(e)}")
+
         self.immatriculation_entry.delete(0, tk.END)
         self.type_var.set("visiteur")
         self.controller.update_vehicle_list()  # Mise à jour de la liste principale
-        self.controller.frames[ListeVehicules].update_list()  # Mise à jour de la page ListeVehicules
+        self.controller.frames[ListeVehicules].update_list()  # MAJ de la page ListeVehicules
 
 # ============================================================
 # SORTIE VEHICULE
@@ -677,19 +689,39 @@ class SortieVehicule(tk.Frame):
         if not immat:
             self.controller.log_info("Erreur : immatriculation vide.")
             return
-        if mon_parking.find_vehicule(immat).type_vehicule == 'abonné':
-            self.controller.log_info("Erreur lors de la sortie: On ne peut pas supprimer un abonné")
-            messagebox.showinfo("Retirer", "Vous ne pouvez pas retirer un abonné")
-            return
 
-        a = mon_parking.calculate_tarif(immat)
-        pdf_path = mon_parking.generer_paiement(immat, a)
-        self.ouvrir_pdf(pdf_path)
-        mon_parking.vehicules_leave(immat)
-        self.controller.log_info(f"Véhicule {immat} sorti du parking.")
+        try:
+            vehicule = mon_parking.find_vehicule(immat)
+
+            if vehicule.type_vehicule == 'abonné':
+                self.controller.log_info(
+                    "Erreur lors de la sortie: On ne peut pas supprimer un abonné"
+                )
+                messagebox.showinfo(
+                    "Retirer", "Vous ne pouvez pas retirer un abonné"
+                )
+                return
+
+            montant = mon_parking.calculate_tarif(immat)
+            pdf_path = mon_parking.generer_paiement(immat, montant)
+            self.ouvrir_pdf(pdf_path)
+
+            mon_parking.vehicules_leave(immat)
+            self.controller.log_info(f"Véhicule {immat} sorti du parking.")
+
+        except MissingVehiculeError as e:
+            self.controller.log_info(
+                f"Erreur lors de la sortie du véhicule {immat} : {e}"
+            )
+            messagebox.showerror("Erreur", str(e))
+
+        except IsASubscriber as e:
+            self.controller.log_info(f"Erreur lors de la sortie: {str(e)}")
+            messagebox.showerror("Erreur", str(e))
+
         self.immatriculation_entry.delete(0, tk.END)
-        self.controller.update_vehicle_list()  # Mise à jour de la liste principale
-        self.controller.frames[ListeVehicules].update_list()  # Mise à jour de la page ListeVehicules
+        self.controller.update_vehicle_list()
+        self.controller.frames[ListeVehicules].update_list()
 
 # ============================================================
 # ABONNEMENT

@@ -117,12 +117,12 @@ class Parking :
                 return v
         return False
 
-    def alert(self, type_v: str):
+    def alert_capacity_full(self, type_v: str):
         """
         PRE:
-            Le type de véhicule est valide (visiteur, handicapé, électrique ou abonné). 
+            Le type de véhicule est soit visiteur, handicapé, électrique ou abonné. 
         POST:
-            Retourne True si les places d'un type données sont pleines.
+            Retourne True si les places d'un type donné sont pleines.
             sinon il retourne False.
         """
         if (type_v == 'visiteur' and
@@ -164,33 +164,33 @@ class Parking :
         for v in self.parking:
             if v.immatriculation == immat:
                 return v
+        raise MissingVehiculeError(immat)
 
     def vehicules_entry(self, immatriculation: str, type_vehicule:  str):
         """
         PRE:  
-            Une place disponible correspondant au type de vehicule existe
+            Aucun prérequis spécifique.
         POST:
             L'instance Vehicule est rajouté à la liste parking,
             sauf pour les abonnés ayant des places fixes.
             la capacité du type de véhicule est incrémenté (+1).
         Exceptions:
-            Lève une exception si le parking est plein
-            ou si aucune place appropriée n'est trouvée.
+            Lève VehiculeError si le véhicule est déjà dans le parking.
+            Lève CapacityError si le parking est plein
+            ou InvalidTypeError si aucune place appropriée n'est trouvée.
         """
         vehicule = Vehicule(immatriculation, datetime.datetime.now(), type_vehicule)
         for v in self.parking:
             if v.immatriculation == vehicule.immatriculation:
-                if v.type_vehicule == "abonné":
-                    raise SubscriberConflictError(v.immatriculation)
                 raise VehiculeError(v.immatriculation, v.type_vehicule)
         if vehicule.type_vehicule == 'visiteur':
-            if self.alert(vehicule.type_vehicule):
+            if self.alert_capacity_full(vehicule.type_vehicule):
                 raise CapacityError(vehicule.type_vehicule)
             self.current_capacity[0] += 1
             self.parking.append(vehicule)
         elif vehicule.type_vehicule == 'handicapé':
-            if self.alert(vehicule.type_vehicule):
-                if self.alert('visiteur'):
+            if self.alert_capacity_full(vehicule.type_vehicule):
+                if self.alert_capacity_full('visiteur'):
                     # Si plus de place handicapé, on vérifie place visiteur
                     # Si il reste des places visiteur alors on change son type en visiteur
                     raise CapacityError(f"{vehicule.type_vehicule} et visiteur")
@@ -201,8 +201,8 @@ class Parking :
                 self.current_capacity[1] += 1
                 self.parking.append(vehicule)
         elif vehicule.type_vehicule == 'électrique':
-            if self.alert(vehicule.type_vehicule):
-                if self.alert('visiteur'):
+            if self.alert_capacity_full(vehicule.type_vehicule):
+                if self.alert_capacity_full('visiteur'):
                     # Si plus de place électrique, on vérifie place visiteur
                     # Si il reste des places visiteur alors on change son type en visiteur
                     raise CapacityError(f"{vehicule.type_vehicule} et visiteur")
@@ -226,8 +226,8 @@ class Parking :
             et le compteur de véhicule par type est décrémenté (-1).
             Retourne True si la sortie est enregistrée.
         Exceptions:
-            Lève une exception si l'immatriculation n'est pas trouvée dans le parking.
-            Lève une exception si le véhicule est un abonné.
+            Lève une exception MissingVehiculeError si l'immatriculation n'est pas trouvée dans le parking.
+            Lève une exception IsASubscriber si le véhicule est un abonné.
         """
         for v in self.parking:
             if v.immatriculation == immatriculation :

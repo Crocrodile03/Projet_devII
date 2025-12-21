@@ -126,11 +126,6 @@
             "type_vehicule": "visiteur"
         },
         {
-            "immatriculation": "VIS-0025",
-            "entry_time": "2025-12-16T11:02:37.946779",
-            "type_vehicule": "visiteur"
-        },
-        {
             "immatriculation": "VIS-0026",
             "entry_time": "2025-12-16T11:01:37.946779",
             "type_vehicule": "visiteur"
@@ -251,18 +246,8 @@
             "type_vehicule": "visiteur"
         },
         {
-            "immatriculation": "VIS-0050",
-            "entry_time": "2025-12-16T10:37:37.946779",
-            "type_vehicule": "visiteur"
-        },
-        {
             "immatriculation": "VIS-0051",
             "entry_time": "2025-12-16T10:36:37.946779",
-            "type_vehicule": "visiteur"
-        },
-        {
-            "immatriculation": "VIS-0052",
-            "entry_time": "2025-12-16T10:35:37.946779",
             "type_vehicule": "visiteur"
         },
         {
@@ -278,11 +263,6 @@
         {
             "immatriculation": "VIS-0055",
             "entry_time": "2025-12-16T10:32:37.946779",
-            "type_vehicule": "visiteur"
-        },
-        {
-            "immatriculation": "VIS-0056",
-            "entry_time": "2025-12-16T10:31:37.946779",
             "type_vehicule": "visiteur"
         },
         {
@@ -597,7 +577,7 @@
         },
         {
             "immatriculation": "ABO-0120",
-            "entry_time": "2025-12-21T18:05:32.848050",
+            "entry_time": "2025-12-21T19:30:09.086589",
             "type_vehicule": "abonn\u00e9",
             "first_name": "Prenom120",
             "last_name": "Nom120",
@@ -605,7 +585,7 @@
         },
         {
             "immatriculation": "ABO-0121",
-            "entry_time": "2025-12-21T18:05:32.848058",
+            "entry_time": "2025-12-21T19:30:09.086593",
             "type_vehicule": "abonn\u00e9",
             "first_name": "Prenom121",
             "last_name": "Nom121",
@@ -613,7 +593,7 @@
         },
         {
             "immatriculation": "ABO-0122",
-            "entry_time": "2025-12-21T18:05:32.848062",
+            "entry_time": "2025-12-21T19:30:09.086594",
             "type_vehicule": "abonn\u00e9",
             "first_name": "Prenom122",
             "last_name": "Nom122",
@@ -621,7 +601,7 @@
         },
         {
             "immatriculation": "aa",
-            "entry_time": "2025-12-21T18:05:32.848065",
+            "entry_time": "2025-12-21T19:30:09.086595",
             "type_vehicule": "abonn\u00e9",
             "first_name": "aa",
             "last_name": "aa",
@@ -629,7 +609,7 @@
         },
         {
             "immatriculation": "AZ",
-            "entry_time": "2025-12-21T18:05:32.848067",
+            "entry_time": "2025-12-21T19:30:09.086597",
             "type_vehicule": "abonn\u00e9",
             "first_name": "AEZZEE",
             "last_name": "AZEZAAZ",
@@ -643,11 +623,6 @@
         {
             "immatriculation": "ezaeze",
             "entry_time": "2025-12-21T18:06:11.258368",
-            "type_vehicule": "visiteur"
-        },
-        {
-            "immatriculation": "zraeraze",
-            "entry_time": "2025-12-21T18:06:22.759989",
             "type_vehicule": "visiteur"
         },
         {
@@ -671,15 +646,38 @@
             "type_vehicule": "visiteur"
         },
         {
-            "immatriculation": "terzae",
-            "entry_time": "2025-12-21T18:06:43.528855",
+            "immatriculation": "gg",
+            "entry_time": "2025-12-21T19:01:24.663552",
             "type_vehicule": "visiteur"
+        },
+        {
+            "immatriculation": "cc",
+            "entry_time": "2025-12-21T19:01:42.879578",
+            "type_vehicule": "visiteur"
+        },
+        {
+            "immatriculation": "AAAAA",
+            "entry_time": "2025-12-21T19:08:55.287472",
+            "type_vehicule": "visiteur"
+        },
+        {
+            "immatriculation": "zzzzzzzz",
+            "entry_time": "2025-12-21T19:24:33.343892",
+            "type_vehicule": "visiteur"
+        },
+        {
+            "immatriculation": "2-ELR-627",
+            "entry_time": "2025-12-21T19:30:33.376097",
+            "type_vehicule": "abonn\u00e9",
+            "first_name": "Cyril",
+            "last_name": "Lamand",
+            "phone_number": "+32479455634"
         }
     ],
     "current_capacity": [
-        118,
+        116,
         5,
         4,
-        5
+        6
     ]
 }
