@@ -102,7 +102,6 @@ class Subscriber(Vehicule) :
                     raise CapacityError(v.type_vehicule)
         p.parking.append(self)
         p.current_capacity[3] += 1
-        print(f"L'abonné {self.first_name} {self.last_name} ({self.immatriculation}) a été ajouté.")
 
     def calculate_subscribe_fee(self):
         """

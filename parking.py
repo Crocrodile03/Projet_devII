@@ -389,3 +389,71 @@ class Parking :
         c.drawCentredString(largeur / 2,y,"Merci de votre visite")
         c.save()
         return file_path
+
+
+
+    def generer_ticket_abonner(self, immatriculation : str, first_name : str, name : str, phone : str):
+        """
+        Génère un ticket PDF pour un nouvel abonné avec ses informations personnelles
+        et le tarif de l'abonnement.
+
+        PRE:
+            - immatriculation, first_name, name, phone sont des chaînes de caractères non vides.
+            - immatriculation respecte le format du véhicule.
+        POST:
+            - Un fichier PDF est généré dans le répertoire :
+              "paiements/abonner/<mois_en_cours>/paiement_abonner_<immatriculation>_<mois>.pdf".
+            - Le PDF contient les informations suivantes :
+                * Immatriculation du véhicule
+                * Prénom et nom de l'abonné
+                * Numéro de téléphone
+                * Date du paiement
+                * Montant du tarif de l'abonnement
+            - La fonction renvoie le chemin complet du fichier PDF généré.
+        """
+        mois_fr = [
+            "janvier", "février", "mars", "avril", "mai", "juin",
+            "juillet", "août", "septembre", "octobre", "novembre", "décembre"
+        ]
+        abonne = Subscriber(immatriculation, first_name, name, phone)
+        amont = abonne.tarif_abonnement
+        directory = f"paiements/abonner/{mois_fr[datetime.datetime.now().month - 1]}"
+        file = f"paiement_abonner_{immatriculation}_{mois_fr[datetime.datetime.now().month - 1]}.pdf"
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        file_path = os.path.join(directory, file)
+        # Format ticket
+        largeur, hauteur = 90 * mm, 120 * mm
+        c = canvas.Canvas(file_path, pagesize=(largeur, hauteur))
+
+        # Décalage vertical pour placer le texte
+        y = hauteur - 10 * mm
+
+        # Titre
+        c.setFont("Helvetica-Bold", 14)
+        c.drawCentredString(largeur / 2, y, "TICKET Abonnement")
+        y -= 10 * mm
+        # Informations
+        c.setFont("Helvetica", 10)
+        c.drawString(5 * mm, y, f"Immatriculation : {immatriculation}")
+        y -= 5 * mm
+        c.drawString(5 * mm, y, f"Prénom : {first_name}")
+        y -= 5 * mm
+        c.drawString(5 * mm, y, f"Nom de famille : {name}")
+        y -= 5 * mm
+        c.drawString(5 * mm, y, f"Numéro de téléphone : {phone}")
+        y -= 5 * mm
+        c.drawString(5 * mm, y, f"Date de paiement : {datetime.datetime.now().strftime('%d/%m/%Y')}")
+        y -= 5 * mm
+        c.drawString(5 * mm, y, f"Montant : {amont} €")
+        y -= 10 * mm
+
+        c.line(5 * mm, y, largeur - 5 * mm, y)
+        y -= 5 * mm
+
+        # Message bas du ticket
+        c.setFont("Helvetica-Oblique", 9)
+        c.drawCentredString(largeur / 2, y, "Abonnement effectuer")
+        c.save()
+        return file_path
+

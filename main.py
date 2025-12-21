@@ -751,6 +751,14 @@ class Abonnement(tk.Frame):
                    text="Retour menu",
                    command=lambda: controller.show_frame(MenuPrincipal)).pack()
 
+    def ouvrir_pdf(self, file_path):
+        """Ouvre un fichier PDF avec le lecteur par défaut."""
+
+        if os.name == "nt":  # Windows
+            os.startfile(file_path)
+        elif os.name == "posix":  # Linux / macOS
+            os.system(f'xdg-open "{file_path}"')
+
     def valider(self):
         """
         Valide la création d'un nouvel abonné.
@@ -774,6 +782,8 @@ class Abonnement(tk.Frame):
             return
         subscriber = Subscriber(immat, first_name, name, phone)
         subscriber.subscribe(mon_parking)
+        pdf_path = mon_parking.generer_ticket_abonner(immat, first_name, name, phone)
+        self.ouvrir_pdf(pdf_path)
         self.controller.log_info(
             f"Utilisateur {name} {first_name} abonné avec immatriculation {immat}.")
         self.immatriculation_entry.delete(0, tk.END)
@@ -782,6 +792,7 @@ class Abonnement(tk.Frame):
         self.phone_entry.delete(0, tk.END)
         self.controller.update_vehicle_list()  # Mise à jour de la liste principale
         self.controller.frames[ListeVehicules].update_list()  # Mise à jour de la page ListeVehicules
+
 
 # ============================================================
 # LISTE VEHICULES
